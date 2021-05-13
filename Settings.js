@@ -17,7 +17,12 @@ class Settings {
 					this.settingsById[setting.id] = setting
 
 					if (savedSettings.hasOwnProperty(setting.id)) {
-						setting.value = savedSettings[setting.id]
+						if (this.settingsById[setting.id].type == "sliderMinMax") {
+							setting.lowerValue = savedSettings[setting.id].min
+							setting.upperValue = savedSettings[setting.id].max
+						} else {
+							setting.value = savedSettings[setting.id]
+						}
 					}
 				})
 			)
@@ -34,14 +39,25 @@ export const getSetting = settingId => {
 	if (globalSettings == null) {
 		globalSettings = new Settings()
 	}
+	if (isSettingMinMaxSlider(settingId)) {
+		return {
+			min: parseFloatIfNotNaN(
+				globalSettings.settingsById[settingId].lowerValue
+			),
+			max: parseFloatIfNotNaN(globalSettings.settingsById[settingId].upperValue)
+		}
+	}
 	return globalSettings.settingsById[settingId]
-		? !isNaN(parseFloat(globalSettings.settingsById[settingId].value))
-			? parseFloat(globalSettings.settingsById[settingId].value)
-			: globalSettings.settingsById[settingId].value
+		? parseFloatIfNotNaN(globalSettings.settingsById[settingId].value)
 		: null
 }
 export const setSetting = (settingId, value) => {
-	globalSettings.settingsById[settingId].value = value
+	if (isSettingMinMaxSlider(settingId)) {
+		globalSettings.settingsById[settingId].lowerValue = value[0]
+		globalSettings.settingsById[settingId].upperValue = value[1]
+	} else {
+		globalSettings.settingsById[settingId].value = value
+	}
 	if (settingCallbacks.hasOwnProperty(settingId)) {
 		settingCallbacks[settingId].forEach(callback => callback())
 	}
@@ -77,7 +93,14 @@ export const setCallbackIf = (ifPredicate, callback) => {
 export const getSettingObject = () => {
 	let obj = {}
 	for (let key in globalSettings.settingsById) {
-		obj[key] = globalSettings.settingsById[key].value
+		if (isSettingMinMaxSlider(key)) {
+			obj[key] = {
+				min: globalSettings.settingsById[key].lowerValue,
+				max: globalSettings.settingsById[key].upperValue
+			}
+		} else {
+			obj[key] = globalSettings.settingsById[key].value
+		}
 	}
 	return obj
 }
@@ -92,11 +115,22 @@ export const resetSettingsToDefault = () => {
 		)
 	)
 
-	let parent = globalSettings.settingsUi.getSettingsDiv(globalSettings.settings)
-		.parentElement
+	let parent = globalSettings.settingsUi.getSettingsDiv(
+		globalSettings.settings
+	).parentElement
 	parent.removeChild(
 		globalSettings.settingsUi.getSettingsDiv(globalSettings.settings)
 	)
 	globalSettings.settingsUi.mainDiv = null
 	parent.appendChild(getSettingsDiv())
+}
+
+function isSettingMinMaxSlider(settingId) {
+	return (
+		globalSettings.settingsById.hasOwnProperty(settingId) &&
+		globalSettings.settingsById[settingId].type == "sliderMinMax"
+	)
+}
+function parseFloatIfNotNaN(num) {
+	return !isNaN(parseFloat(num)) ? parseFloat(num) : num
 }

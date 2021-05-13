@@ -341,6 +341,15 @@ function findSideToTurn(ang1, ang2) {
 		return -1
 	}
 }
+/**
+ * Requires p to have .min and .max attributes set.
+ *
+ * @param {object} p
+ * @returns range between p.min and p.max
+ */
+function getRange(p) {
+	return p.max - p.min
+}
 
 export {
 	formatTime,
@@ -359,5 +368,6 @@ export {
 	angle,
 	compareAngles,
 	turnTowards,
-	findSideToTurn
+	findSideToTurn,
+	getRange
 }

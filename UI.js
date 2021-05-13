@@ -1,6 +1,4 @@
-// import { getDefaultSettings } from "./DefaultSettings.js"
 import { DomHelper } from "./DomHelper.js"
-import { SettingUI } from "./SettingUI.js"
 import { getSettingsDiv } from "./Settings.js"
 
 export class UI {
@@ -33,10 +31,13 @@ export class UI {
 				document.querySelector(".buttonEffect").classList.add("animated")
 				btnBG.removeEventListener("mouseenter", initalListener)
 			}
-			btnBG.addEventListener("mouseenter", initalListener)
+			btnBG.addEventListener("click", initalListener)
 
-			this.buttonPreviewDiv.appendChild(btn)
-			this.buttonPreviewDiv.appendChild(btnBG)
+			let btnWrap = DomHelper.createDivWithClass("buttonWrap")
+			btnWrap.appendChild(btnBG)
+			btnWrap.appendChild(btn)
+
+			this.buttonPreviewDiv.appendChild(btnWrap)
 		}
 		return this.buttonPreviewDiv
 	}

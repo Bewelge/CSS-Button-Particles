@@ -1,4 +1,5 @@
 import { replaceAllString } from "../Util.js"
+import { roundToDecimals } from "./Util.js"
 
 export class DomHelper {
 	static createCanvas(width, height, styles) {
@@ -99,6 +100,93 @@ export class DomHelper {
 		cont.appendChild(slider)
 
 		return { slider: slider, container: cont }
+	}
+
+	static createDoubleSliderWithLabelAndField(
+		id,
+		label,
+		lowerVal,
+		upperVal,
+		min,
+		max,
+		step,
+		onChange
+	) {
+		let minSlider, maxSlider
+
+		let displayDiv = DomHelper.createElement(
+			"div",
+			{},
+			{
+				id: id + "Field",
+				className: "sliderVal",
+				innerHTML:
+					roundToDecimals(lowerVal, 0) + " - > " + roundToDecimals(upperVal, 0)
+			}
+		)
+
+		let minOnChange = ev => {
+			let minVal = parseFloat(ev.target.value)
+			let maxVal = parseFloat(maxSlider.value)
+			if (minVal > maxVal) {
+				maxSlider.value = minVal
+				maxVal = maxSlider.value
+			}
+			if (minVal == maxVal) {
+				displayDiv.innerHTML = minVal
+			} else {
+				displayDiv.innerHTML = minVal + " < - > " + maxVal
+			}
+			onChange(minVal, maxVal)
+		}
+		let maxOnChange = ev => {
+			let minVal = parseFloat(minSlider.value)
+			let maxVal = parseFloat(ev.target.value)
+			if (maxVal < minVal) {
+				minSlider.value = maxVal
+				minVal = minSlider.value
+			}
+			if (minVal == maxVal) {
+				displayDiv.innerHTML = maxVal
+			} else {
+				displayDiv.innerHTML = minVal + " < - > " + maxVal
+			}
+			onChange(minVal, maxVal)
+		}
+
+		let cont = DomHelper.createElement(
+			"div",
+			{},
+			{ id: id + "container", className: "sliderContainer" }
+		)
+		let labelDiv = DomHelper.createElement(
+			"label",
+			{},
+			{ id: id + "label", className: "sliderLabel", innerHTML: label }
+		)
+		minSlider = DomHelper.createSlider(
+			id,
+			lowerVal,
+			min,
+			max,
+			step,
+			minOnChange
+		)
+		maxSlider = DomHelper.createSlider(
+			id,
+			upperVal,
+			min,
+			max,
+			step,
+			maxOnChange
+		)
+		DomHelper.addClassToElements("doubleSlider", [minSlider, maxSlider])
+		cont.appendChild(labelDiv)
+		cont.appendChild(displayDiv)
+		cont.appendChild(minSlider)
+		cont.appendChild(maxSlider)
+
+		return { slider: minSlider, sliderMax: maxSlider, container: cont }
 	}
 	static createGlyphiconButton(id, glyph, onClick) {
 		let bt = DomHelper.createButton(id, onClick)

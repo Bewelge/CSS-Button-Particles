@@ -142,6 +142,8 @@ export class SettingUI {
 				return SettingUI.createSliderSettingDiv(setting)
 			case "color":
 				return SettingUI.createColorSettingDiv(setting)
+			case "sliderMinMax":
+				return SettingUI.createMinMaxSliderSettingDiv(setting)
 		}
 	}
 	static createListSettingDiv(setting) {
@@ -169,6 +171,20 @@ export class SettingUI {
 			setting.id + "Slider",
 			setting.label,
 			parseFloat(setting.value),
+			setting.min,
+			setting.max,
+			setting.step,
+			setting.onChange
+		).container
+		el.classList.add("settingContainer")
+		return el
+	}
+	static createMinMaxSliderSettingDiv(setting) {
+		let el = DomHelper.createDoubleSliderWithLabelAndField(
+			setting.id + "Slider",
+			setting.label,
+			parseFloat(setting.lowerValue),
+			parseFloat(setting.upperValue),
 			setting.min,
 			setting.max,
 			setting.step,

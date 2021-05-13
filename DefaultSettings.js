@@ -1,4 +1,5 @@
 import { setSetting } from "./Settings.js"
+import { getCssVariable } from "./Util.js"
 
 export const getDefaultSettings = () => {
 	let copy = {}
@@ -21,807 +22,248 @@ const TAB_GENERAL = "General"
 const TAB_AUDIO = "Audio"
 const TAB_VIDEO = "Video"
 
+export const SETTING_IDS = {
+	PARTICLE_AMOUNT: "particleAmount",
+	ANIMATION_DURATION: "animationDuration",
+	KEYFRAME_AMOUNT: "keyframes",
+	SIMULATIONS_PER_KEYFRAME: "simsPerKeyframe",
+	GRAVITY: "grav",
+	FRICTION: "fric",
+	ANGULAR_FRICTION: "angFric",
+	ANGLE_SPREAD_EVENLY: "anglSprd",
+	START_ANGLE: "startAngle",
+	START_SIZE: "startSiz",
+	START_RADIUS: "startRad",
+	SIZE_CHANGE: "sizeChange",
+	ROTATION_CHANGE: "rotChange",
+	START_SPEED: "spd",
+	BUTTON_WIDTH: "btnWd",
+	BUTTON_HEIGHT: "btnHt",
+	BG_WIDTH: "bgW",
+	BG_HEIGHT: "bgH",
+	BG_COLOR: "black"
+}
 const defaultSettings = {
 	General: {
 		default: [
 			{
 				type: "slider",
-				id: "particleAmount",
+				id: SETTING_IDS.PARTICLE_AMOUNT,
 				label: "Particle amount",
 				value: 20,
-				min: 0,
+				min: 1,
 				max: 250,
 				step: 1,
-				recreateShapes: true,
-				onChange: value => setSetting("particleAmount", value)
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.PARTICLE_AMOUNT, value)
 			},
 			{
 				type: "slider",
-				id: "animationDuration",
+				id: SETTING_IDS.ANIMATION_DURATION,
 				label: "Animation duration (s)",
 				value: 1.5,
+				min: 0.05,
+				max: 60,
+				step: 0.05,
+				recreateCss: false,
+				onChange: value => setSetting(SETTING_IDS.ANIMATION_DURATION, value)
+			},
+			{
+				type: "slider",
+				id: SETTING_IDS.KEYFRAME_AMOUNT,
+				label: "Keyframe amount",
+				value: 10,
+				min: 2,
+				max: 100,
+				step: 1,
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.KEYFRAME_AMOUNT, value)
+			},
+			{
+				type: "slider",
+				id: SETTING_IDS.SIMULATIONS_PER_KEYFRAME,
+				label: "Simulations per Keyframe",
+				value: 25,
+				min: 1,
+				max: 500,
+				step: 1,
+				recreateCss: true,
+				onChange: value =>
+					setSetting(SETTING_IDS.SIMULATIONS_PER_KEYFRAME, value)
+			},
+			{
+				type: "slider",
+				id: SETTING_IDS.GRAVITY,
+				label: "Gravity",
+				value: 10,
+				min: -100,
+				max: 100,
+				step: 1,
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.GRAVITY, value)
+			},
+			{
+				type: "slider",
+				id: SETTING_IDS.FRICTION,
+				label: "Friction",
+				value: 0.02,
+				min: 0,
+				max: 1,
+				step: 0.01,
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.FRICTION, value)
+			},
+			{
+				type: "slider",
+				id: SETTING_IDS.ANGULAR_FRICTION,
+				label: "Angular friction",
+				value: 0.02,
+				min: 0,
+				max: 1,
+				step: 0.01,
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.ANGULAR_FRICTION, value)
+			},
+			{
+				type: "checkbox",
+				id: SETTING_IDS.ANGLE_SPREAD_EVENLY,
+				label: "Spread start angle evenly",
+				value: true,
+				recreateCss: true,
+				onChange: event =>
+					setSetting(SETTING_IDS.ANGLE_SPREAD_EVENLY, event.target.checked)
+			},
+			{
+				type: "sliderMinMax",
+				id: SETTING_IDS.START_ANGLE,
+				label: "Starting Angle",
+				lowerValue: 0,
+				upperValue: Math.PI * 2,
+				min: 0,
+				max: Math.PI * 2,
+				step: 0.1,
+				recreateCss: true,
+				onChange: (lower, upper) =>
+					setSetting(SETTING_IDS.START_ANGLE, [lower, upper])
+			},
+			{
+				type: "sliderMinMax",
+				id: SETTING_IDS.START_SIZE,
+				label: "Particle Size",
+				lowerValue: 15,
+				upperValue: 25,
+				min: 0,
+				max: 100,
+				step: 0.5,
+				recreateCss: true,
+				onChange: (lower, upper) =>
+					setSetting(SETTING_IDS.START_SIZE, [lower, upper])
+			},
+			{
+				type: "sliderMinMax",
+				id: SETTING_IDS.START_RADIUS,
+				label: "Starting Radius",
+				lowerValue: 45,
+				upperValue: 45,
+				min: 0,
+				max: 100,
+				step: 1,
+				recreateCss: true,
+				onChange: (lower, upper) =>
+					setSetting(SETTING_IDS.START_RADIUS, [lower, upper])
+			},
+			{
+				type: "sliderMinMax",
+				id: SETTING_IDS.SIZE_CHANGE,
+				label: "Size Change",
+				lowerValue: 5,
+				upperValue: 10,
+				min: -100,
+				max: 100,
+				step: 0.1,
+				recreateCss: true,
+				onChange: (lower, upper) =>
+					setSetting(SETTING_IDS.SIZE_CHANGE, [lower, upper])
+			},
+			{
+				type: "sliderMinMax",
+				id: SETTING_IDS.ROTATION_CHANGE,
+				label: "Direction change",
+				lowerValue: -0.1,
+				upperValue: 0.1,
+				min: -0.5,
+				max: 0.5,
+				step: 0.01,
+				recreateCss: true,
+				onChange: (lower, upper) =>
+					setSetting(SETTING_IDS.ROTATION_CHANGE, [lower, upper])
+			},
+			{
+				type: "sliderMinMax",
+				id: SETTING_IDS.START_SPEED,
+				label: "Particle Speed",
+				lowerValue: 2,
+				upperValue: 15,
 				min: 0,
 				max: 60,
 				step: 0.1,
-				recreateShapes: false,
-				onChange: value => setSetting("animationDuration", value)
+				recreateCss: true,
+				onChange: (lower, upper) =>
+					setSetting(SETTING_IDS.START_SPEED, [lower, upper])
 			},
 
 			{
 				type: "slider",
-				id: "startAngleMin",
-				label: "startAngleMin",
-				value: 0,
-				min: 0,
-				max: Math.PI * 2,
-				step: 0.1,
-				recreateShapes: true,
-				onChange: value => setSetting("startAngleMin", value)
-			},
-			{
-				type: "slider",
-				id: "startAngleMax",
-				label: "startAngleMax",
-				value: 0,
-				min: 0,
-				max: Math.PI * 2,
-				step: 0.1,
-				recreateShapes: true,
-				onChange: value => setSetting("startAngleMax", value)
-			},
-			{
-				type: "slider",
-				id: "startSizeMin",
-				label: "startSizeMin",
-				value: 15,
-				min: 0,
-				max: 60,
-				step: 0.5,
-				recreateShapes: true,
-				onChange: value => setSetting("startSizeMin", value)
-			},
-			{
-				type: "slider",
-				id: "startSizeMax",
-				label: "startSizeMax",
-				value: 25,
-				min: 0,
-				max: 60,
-				step: 0.5,
-				recreateShapes: true,
-				onChange: value => setSetting("startSizeMax", value)
-			},
-			{
-				type: "slider",
-				id: "startRadiusMin",
-				label: "startRadiusMin",
-				value: 45,
-				min: 0,
-				max: 100,
-				step: 0.1,
-				recreateShapes: true,
-				onChange: value => setSetting("startRadiusMin", value)
-			},
-			{
-				type: "slider",
-				id: "startRadiusMax",
-				label: "startRadiusMax",
-				value: 45,
-				min: 0,
-				max: 100,
-				step: 0.1,
-				recreateShapes: true,
-				onChange: value => setSetting("startRadiusMax", value)
-			},
-			{
-				type: "slider",
-				id: "sizeChangeMin",
-				label: "sizeChangeMin",
-				value: 5,
-				min: 0,
-				max: 60,
+				id: SETTING_IDS.BUTTON_WIDTH,
+				label: "Button Width",
+				value: 90,
+				min: 50,
+				max: 500,
 				step: 1,
-				recreateShapes: true,
-				onChange: value => setSetting("sizeChangeMin", value)
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.BUTTON_WIDTH, value)
 			},
 			{
 				type: "slider",
-				id: "sizeChangeMax",
-				label: "sizeChangeMax",
-				value: 10,
-				min: 0,
-				max: 60,
+				id: SETTING_IDS.BUTTON_HEIGHT,
+				label: "Button Height",
+				value: 90,
+				min: 50,
+				max: 500,
 				step: 1,
-				recreateShapes: true,
-				onChange: value => setSetting("sizeChangeMax", value)
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.BUTTON_HEIGHT, value)
 			},
 			{
 				type: "slider",
-				id: "rotChangeMin",
-				label: "rotChangeMin",
-				value: 0.1,
-				min: 0,
-				max: Math.PI,
-				step: 0.01,
-				recreateShapes: true,
-				onChange: value => setSetting("rotChangeMin", value)
+				id: SETTING_IDS.BG_WIDTH,
+				label: "Bg Width",
+				value: 200,
+				min: 50,
+				max: 2500,
+				step: 1,
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.BG_WIDTH, value)
 			},
 			{
 				type: "slider",
-				id: "rotChangeMax",
-				label: "rotChangeMax",
-				value: 0.5,
-				min: 0,
-				max: Math.PI,
-				step: 0.01,
-				recreateShapes: true,
-				onChange: value => setSetting("rotChangeMax", value)
+				id: SETTING_IDS.BG_HEIGHT,
+				label: "Bg Height",
+				value: 200,
+				min: 50,
+				max: 2500,
+				step: 1,
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.BG_HEIGHT, value)
 			},
 			{
-				type: "slider",
-				id: "startMomentumMin",
-				label: "startMomentumMin",
-				value: 2,
-				min: 0,
-				max: 60,
-				step: 0.1,
-				recreateShapes: true,
-				onChange: value => setSetting("startMomentumMin", value)
-			},
-			{
-				type: "slider",
-				id: "startMomentumMax",
-				label: "startMomentumMax",
-				value: 15,
-				min: 0,
-				max: 60,
-				step: 0.1,
-				recreateShapes: true,
-				onChange: value => setSetting("startMomentumMax", value)
+				type: "color",
+				id: SETTING_IDS.BG_COLOR,
+				label: "Button background color",
+				value: getCssVariable("buttonColor"),
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.BG_COLOR, value)
 			}
 		]
 	}
-	//tabs
-	// General: {
-	//default or subcategory
-	// 	default: [
-	// 		{
-	// 			type: "slider",
-	// 			id: "renderOffset",
-	// 			label: "Render offset (ms)",
-	// 			value: 0,
-	// 			min: -250,
-	// 			max: 250,
-	// 			step: 1,
-	// 			onChange: value => setSetting("renderOffset", value)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "fitZoomOnNewSong",
-	// 			label: "Auto fit zoom for new songs",
-	// 			value: false,
-	// 			onChange: ev => {
-	// 				setSetting("fitZoomOnNewSong", ev.target.checked)
-	// 			}
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "reverseNoteDirection",
-	// 			label: "Reverse note direction",
-	// 			value: false,
-	// 			onChange: ev => {
-	// 				setSetting("reverseNoteDirection", ev.target.checked)
-	// 				setSetting(
-	// 					"pianoPosition",
-	// 					Math.abs(parseInt(getSetting("pianoPosition")) + 1)
-	// 				)
-	// 			}
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showBPM",
-	// 			label: "Show BPM",
-	// 			value: false,
-	// 			onChange: ev => setSetting("showBPM", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showMiliseconds",
-	// 			label: "Show Miliseconds",
-	// 			value: false,
-	// 			onChange: ev => setSetting("showMiliseconds", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showNoteDebugInfo",
-	// 			label: "Enable note debug info on hover over note",
-	// 			value: false,
-	// 			onChange: ev => setSetting("showNoteDebugInfo", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showMarkersSong",
-	// 			label: "Show markers in the song",
-	// 			value: false,
-	// 			onChange: ev => setSetting("showMarkersSong", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showMarkersTimeline",
-	// 			label: "Show markers on timeline",
-	// 			value: false,
-	// 			onChange: ev => setSetting("showMarkersTimeline", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showFps",
-	// 			label: "Show FPS",
-	// 			value: true,
-	// 			onChange: ev => setSetting("showFps", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "color",
-	// 			id: "inputNoteColorWhite",
-	// 			label: "Your white note color",
-	// 			value: "rgba(40,155,155,0.8)",
-	// 			onChange: value => setSetting("inputNoteColorWhite", value)
-	// 		},
-	// 		{
-	// 			type: "color",
-	// 			id: "inputNoteColorBlack",
-	// 			label: "Your black note color",
-	// 			value: "rgba(40,155,155,0.8)",
-	// 			onChange: value => setSetting("inputNoteColorBlack", value)
-	// 		},
-	// 		{
-	// 			type: "list",
-	// 			id: "inputInstrument",
-	// 			label: "Your Instrument",
-	// 			value: "acoustic_grand_piano",
-	// 			list: Object.keys(CONST.INSTRUMENTS.BY_ID)
-	// 				.map(id => CONST.INSTRUMENTS.BY_ID[id].id)
-	// 				.sort(),
-	// 			onChange: value => setSetting("inputInstrument", value)
-	// 		}
-	// 	],
-	// 	"On Screen Piano": [
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "clickablePiano",
-	// 			label: "Clickable piano",
-	// 			value: true,
-	// 			onChange: ev => setSetting("clickablePiano", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showKeyNamesOnPianoWhite",
-	// 			label: "Show white key names on piano",
-	// 			value: false,
-	// 			onChange: ev =>
-	// 				setSetting("showKeyNamesOnPianoWhite", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showKeyNamesOnPianoBlack",
-	// 			label: "Show black key names on piano",
-	// 			value: false,
-	// 			onChange: ev =>
-	// 				setSetting("showKeyNamesOnPianoBlack", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showPianoKeyNameFlats",
-	// 			label: "Black key names as flats",
-	// 			value: false,
-	// 			onChange: ev => setSetting("showPianoKeyNameFlats", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "highlightActivePianoKeys",
-	// 			label: "Color active piano keys",
-	// 			value: true,
-	// 			onChange: ev => setSetting("showPianoKeys", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "drawPianoKeyHitEffect",
-	// 			label: "Piano Hit key effect",
-	// 			value: true,
-	// 			onChange: ev => setSetting("drawPianoKeyHitEffect", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "pianoPosition",
-	// 			label: "Piano Position",
-	// 			value: 20,
-	// 			min: 0,
-	// 			max: 100,
-	// 			step: 1,
-	// 			onChange: value => setSetting("pianoPosition", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "whiteKeyHeight",
-	// 			label: "Height (%) - White keys",
-	// 			value: 100,
-	// 			min: 0,
-	// 			max: 200,
-	// 			step: 1,
-	// 			onChange: value => setSetting("whiteKeyHeight", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "blackKeyHeight",
-	// 			label: "Height (%) - Black keys",
-	// 			value: 100,
-	// 			min: 0,
-	// 			max: 200,
-	// 			step: 1,
-	// 			onChange: value => setSetting("blackKeyHeight", value)
-	// 		}
-	// 	]
-	// },
-
-	// Video: {
-	// 	default: [
-	// 		{
-	// 			type: "slider",
-	// 			id: "noteToHeightConst",
-	// 			label: "Seconds shown on screen",
-	// 			value: 3,
-	// 			min: 0.1,
-	// 			max: 30,
-	// 			step: 0.1,
-	// 			onChange: value => setSetting("noteToHeightConst", value)
-	// 		}
-	// 	],
-	// 	"Note Appearance": [
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showHitKeys",
-	// 			label: "Active Notes effect",
-	// 			value: true,
-	// 			onChange: ev => setSetting("showHitKeys", ev.target.checked)
-	// 		},
-
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "strokeActiveNotes",
-	// 			label: "Stroke active notes",
-	// 			value: true,
-	// 			onChange: ev => setSetting("strokeActiveNotes", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "color",
-	// 			id: "strokeActiveNotesColor",
-	// 			label: "Stroke color",
-	// 			value: "rgba(240,240,240,0.5)",
-	// 			onChange: value => setSetting("strokeActiveNotesColor", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "strokeActiveNotesWidth",
-	// 			label: "Stroke width",
-	// 			value: "4",
-	// 			min: 1,
-	// 			max: 10,
-	// 			step: 0.5,
-	// 			onChange: value => setSetting("strokeActiveNotesWidth", value)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "strokeNotes",
-	// 			label: "Stroke notes",
-	// 			value: true,
-	// 			onChange: ev => setSetting("strokeNotes", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "color",
-	// 			id: "strokeNotesColor",
-	// 			label: "Stroke color",
-	// 			value: "rgba(0,0,0,1)",
-	// 			onChange: value => setSetting("strokeNotesColor", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "strokeNotesWidth",
-	// 			label: "Stroke width",
-	// 			value: "1",
-	// 			min: 1,
-	// 			max: 10,
-	// 			step: 0.5,
-	// 			onChange: value => setSetting("strokeNotesWidth", value)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "roundedNotes",
-	// 			label: "Rounded notes",
-	// 			value: true,
-	// 			onChange: ev => setSetting("roundedNotes", ev.target.checked)
-	// 		},
-	// 		//TODO fix getAlphaFromY in Noterender.
-	// 		// {
-	// 		// 	type: "checkbox",
-	// 		// 	id: "fadeInNotes",
-	// 		// 	label: "Enable fade in effect",
-	// 		// 	value: true,
-	// 		// 	onChange: ev => setSetting("fadeInNotes", ev.target.checked)
-	// 		// },
-	// 		{
-	// 			type: "slider",
-	// 			id: "noteBorderRadius",
-	// 			label: "Note border radius (%)",
-	// 			value: 15,
-	// 			min: 0,
-	// 			max: 50,
-	// 			step: 1,
-	// 			onChange: value => setSetting("noteBorderRadius", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "minNoteHeight",
-	// 			label: "Minimum Note height (px)",
-	// 			value: 10,
-	// 			min: 1,
-	// 			max: 50,
-	// 			step: 1,
-	// 			onChange: value => setSetting("minNoteHeight", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "noteEndedShrink",
-	// 			label: "Played Notes shrink speed",
-	// 			value: 1,
-	// 			min: 0,
-	// 			max: 5,
-	// 			step: 0.1,
-	// 			onChange: value => setSetting("noteEndedShrink", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "playedNoteFalloffSpeed",
-	// 			label: "Played Note Speed",
-	// 			value: 1,
-	// 			min: 0.1,
-	// 			max: 10,
-	// 			step: 0.1,
-	// 			onChange: value => setSetting("playedNoteFalloffSpeed", value)
-	// 		}
-	// 	],
-	// 	Sustain: [
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showSustainOnOffs",
-	// 			label: "Draw Sustain On/Off Events",
-	// 			value: false,
-	// 			onChange: function (ev) {
-	// 				setSetting("showSustainOnOffs", ev.target.checked)
-	// 			}
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showSustainChannels",
-	// 			label: "Show sustain channels",
-	// 			value: false,
-	// 			onChange: function (ev) {
-	// 				setSetting("showSustainChannels", ev.target.checked)
-	// 			}
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showSustainPeriods",
-	// 			label: "Draw Sustain Periods",
-	// 			value: false,
-	// 			onChange: ev => setSetting("showSustainPeriods", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showSustainedNotes",
-	// 			label: "Draw Sustained Notes",
-	// 			value: false,
-	// 			onChange: ev => setSetting("showSustainedNotes", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "sustainedNotesOpacity",
-	// 			label: "Sustained Notes Opacity (%)",
-	// 			value: 50,
-	// 			min: 0,
-	// 			max: 100,
-	// 			step: 1,
-	// 			onChange: value => setSetting("sustainedNotesOpacity", value)
-	// 		}
-	// 	],
-	// 	Particles: [
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "particleStroke",
-	// 			label: "Stroke particles",
-	// 			value: false,
-	// 			onChange: ev => setSetting("particleStroke", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "particleRenderBehind",
-	// 			label: "Render behind notes",
-	// 			value: true,
-	// 			onChange: ev => setSetting("particleRenderBehind", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "color",
-	// 			id: "particleStrokeColor",
-	// 			label: "Stroke color",
-	// 			value: "rgba(255,255,255,0.8)",
-	// 			onChange: value => setSetting("particleStrokeColor", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "particleStrokeWidth",
-	// 			label: "Particle stroke width",
-	// 			value: 0.5,
-	// 			min: 0,
-	// 			max: 5,
-	// 			step: 0.1,
-	// 			onChange: value => setSetting("particleStrokeWidth", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "particleBlur",
-	// 			label: "Particle blur amount (px)",
-	// 			value: 0,
-	// 			min: 0,
-	// 			max: 10,
-	// 			step: 1,
-	// 			onChange: value => setSetting("particleBlur", value)
-	// 		}
-	// 	],
-	// 	"Particles Top": [
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showParticlesTop",
-	// 			label: "Enable top particles",
-	// 			value: true,
-	// 			onChange: ev => setSetting("showParticlesTop", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "particleRisingTop",
-	// 			label: "Particle fall/rise speed",
-	// 			value: 1,
-	// 			min: -2,
-	// 			max: 2,
-	// 			step: 0.1,
-	// 			onChange: value => setSetting("particleRisingTop", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "particleAmountTop",
-	// 			label: "Particle Amount (per frame)",
-	// 			value: 1,
-	// 			min: 0,
-	// 			max: 15,
-	// 			step: 1,
-	// 			onChange: value => setSetting("particleAmountTop", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "particleSizeTop",
-	// 			label: "Particle Size",
-	// 			value: 6,
-	// 			min: 0,
-	// 			max: 10,
-	// 			step: 1,
-	// 			onChange: value => setSetting("particleSizeTop", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "particleLifeTop",
-	// 			label: "Particle Duration",
-	// 			value: 20,
-	// 			min: 1,
-	// 			max: 150,
-	// 			step: 1,
-	// 			onChange: value => setSetting("particleLifeTop", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "particleSpeedTop",
-	// 			label: "Particle Speed",
-	// 			value: 4,
-	// 			min: 1,
-	// 			max: 15,
-	// 			step: 1,
-	// 			onChange: value => setSetting("particleSpeedTop", value)
-	// 		}
-	// 	],
-	// 	"Particles Bottom": [
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "showParticlesBottom",
-	// 			label: "Enable bottom particles ",
-	// 			value: true,
-	// 			onChange: ev => setSetting("showParticlesBottom", ev.target.checked)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "particleRisingBottom",
-	// 			label: "Particle fall/rise speed",
-	// 			value: 1,
-	// 			min: -2,
-	// 			max: 2,
-	// 			step: 0.1,
-	// 			onChange: value => setSetting("particleRisingBottom", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "particleAmountBottom",
-	// 			label: "Particle Amount (per frame)",
-	// 			value: 1,
-	// 			min: 0,
-	// 			max: 15,
-	// 			step: 1,
-	// 			onChange: value => setSetting("particleAmountBottom", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "particleSizeBottom",
-	// 			label: "Particle Size",
-	// 			value: 6,
-	// 			min: 0,
-	// 			max: 10,
-	// 			step: 1,
-	// 			onChange: value => setSetting("particleSizeBottom", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "particleLifeBottom",
-	// 			label: "Particle Duration",
-	// 			value: 20,
-	// 			min: 1,
-	// 			max: 150,
-	// 			step: 1,
-	// 			onChange: value => setSetting("particleLifeBottom", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "particleSpeedBottom",
-	// 			label: "Particle Speed",
-	// 			value: 4,
-	// 			min: 1,
-	// 			max: 15,
-	// 			step: 1,
-	// 			onChange: value => setSetting("particleSpeedBottom", value)
-	// 		}
-	// 	],
-	// 	Background: [
-	// 		{
-	// 			type: "color",
-	// 			id: "bgCol1",
-	// 			label: "Background fill color 1",
-	// 			value: "rgba(40,40,40,0.8)",
-	// 			onChange: value => {
-	// 				setSetting("bgCol1", value)
-	// 			}
-	// 		},
-	// 		{
-	// 			type: "color",
-	// 			id: "bgCol2",
-	// 			label: "Background fill color 2",
-	// 			value: "rgba(25,25,25,1)",
-	// 			onChange: value => {
-	// 				setSetting("bgCol2", value)
-	// 			}
-	// 		},
-	// 		{
-	// 			type: "color",
-	// 			id: "bgCol3",
-	// 			label: "Background stroke color 1",
-	// 			value: "rgba(10,10,10,0.5)",
-	// 			onChange: value => {
-	// 				setSetting("bgCol3", value)
-	// 			}
-	// 		},
-	// 		{
-	// 			type: "color",
-	// 			id: "bgCol4",
-	// 			label: "Background stroke color 2",
-	// 			value: "rgba(10,10,10,0.5)",
-	// 			onChange: value => {
-	// 				setSetting("bgCol4", value)
-	// 			}
-	// 		}
-	// 	]
-	// },
-	// Audio: {
-	// 	default: [
-	// 		{
-	// 			type: "list",
-	// 			id: "soundfontName",
-	// 			label: "Soundfont",
-	// 			value: "MusyngKite",
-	// 			list: ["MusyngKite", "FluidR3_GM", "FatBoy"],
-	// 			onChange: newVal => setSetting("soundfontName", newVal)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "sustainEnabled",
-	// 			label: "Enable Sustain",
-	// 			value: true,
-	// 			onChange: function (ev) {
-	// 				setSetting("sustainEnabled", ev.target.checked)
-	// 			}.bind(this)
-	// 		},
-	// 		{
-	// 			type: "checkbox",
-	// 			id: "enableMetronome",
-	// 			label: "Enable Metronome",
-	// 			value: false,
-	// 			onChange: function (ev) {
-	// 				setSetting("enableMetronome", ev.target.checked)
-	// 			}.bind(this)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "metronomeVolume",
-	// 			label: "Metronome Volume",
-	// 			value: 0.1,
-	// 			min: 0,
-	// 			max: 1,
-	// 			step: 0.05,
-	// 			onChange: value => setSetting("metronomeVolume", value)
-	// 		}
-	// 	],
-	// 	"ADSR Envelope": [
-	// 		{
-	// 			type: "slider",
-	// 			id: "adsrAttack",
-	// 			label: "Attack (Seconds)",
-	// 			value: 0,
-	// 			min: 0,
-	// 			max: 2,
-	// 			step: 0.01,
-	// 			onChange: value => setSetting("adsrAttack", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "adsrDecay",
-	// 			label: "Decay (Seconds)",
-	// 			value: 0,
-	// 			min: 0,
-	// 			max: 0.5,
-	// 			step: 0.01,
-	// 			onChange: value => setSetting("adsrDecay", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "adsrSustain",
-	// 			label: "Sustain (%)",
-	// 			value: 100,
-	// 			min: 0,
-	// 			max: 100,
-	// 			step: 1,
-	// 			onChange: value => setSetting("adsrSustain", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "adsrReleaseKey",
-	// 			label: "Release - Key (Seconds)",
-	// 			value: 0.2,
-	// 			min: 0,
-	// 			max: 2,
-	// 			step: 0.01,
-	// 			onChange: value => setSetting("adsrReleaseKey", value)
-	// 		},
-	// 		{
-	// 			type: "slider",
-	// 			id: "adsrReleasePedal",
-	// 			label: "Release - Pedal (Seconds)",
-	// 			value: 0.2,
-	// 			min: 0,
-	// 			max: 2,
-	// 			step: 0.01,
-	// 			onChange: value => setSetting("adsrReleasePedal", value)
-	// 		}
-	// 	]
-	// }
 }

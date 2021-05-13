@@ -1,0 +1,195 @@
+.sliderContainer {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	position: relative;
+	width: 80%;
+	margin-left: 10%;
+}
+.inputSelect {
+	float: right;
+	margin-left: 3px;
+}
+.inputSelectLabel,
+.sliderLabel,
+.checkboxlabel,
+.settingLabel {
+	display: inline-block;
+	color: var(--inputColor1);
+	z-index: 15;
+	pointer-events: none;
+	font-size: 0.75rem;
+	-ms-user-select: none; /* Internet Explorer/Edge */
+	user-select: none;
+}
+
+.colorPickerButtonContainer {
+	float: right;
+	width: 1.5em;
+	height: 1.5em;
+	margin-top: 0em;
+	border-radius: 0;
+	border: 1px solid var(--inputColor2);
+	background-color: rgba(0, 0, 0, 0);
+}
+
+.checkboxlabel {
+	color: var(--fontWeakenedColor);
+	transition: all 0.15s ease-out;
+}
+.checkboxInput:checked + label {
+	color: var(--inputColor1);
+}
+
+.checkboxInput {
+	float: right;
+	width: 1.5em;
+	height: 1.5em;
+	margin-top: 0em;
+	border-radius: 0;
+	border: 1px solid var(--inputColor2);
+	margin: 0;
+
+	background-color: none;
+	box-shadow: inset 0em 0em 0em 1em var(--inputColor1),
+		inset 0em 0em 0em 0.75em var(--inputColor4);
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+
+	transition: all 0.15s ease-out;
+}
+
+.checkboxInput:checked {
+	box-shadow: inset 0em 0em 0em 0.3em var(--inputColor1),
+		inset 0em 0em 0em 0.75em var(--buttonColor2);
+}
+.checkboxInput:active {
+	border: 1px solid var(--inputColor2);
+}
+.checkboxInput:focus {
+	border: 1px solid var(--inputColor2);
+	outline: none;
+}
+
+input[type="text"] {
+	outline: none;
+	box-sizing: border-box;
+	margin-left: 1px;
+	margin-top: 1px;
+	border-width: 0px;
+	border-radius: 0em;
+	margin-top: 3px;
+	margin-bottom: 3px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	background-color: var(--inputColor3);
+	color: var(--inputColor4);
+}
+
+.sliderVal {
+	margin-top: 5px;
+	margin-right: 5px;
+	float: right;
+	color: var(--inputColor1);
+	z-index: 15;
+	pointer-events: none;
+	font-size: 0.75rem;
+}
+input[type="range"] {
+	-webkit-appearance: none;
+	margin: 10px 0;
+	padding-left: 1px;
+	padding-right: 1px;
+	transition: all 1s ease-out;
+	background-color: rgba(0, 0, 0, 0);
+	pointer-events: none;
+	position: absolute;
+	left: 0%;
+	width: 100%;
+	top: 15px;
+}
+input[type="range"]:focus {
+	outline: none;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+	width: 100%;
+	height: 16px;
+	cursor: pointer;
+	background: var(--inputColor3);
+	border-radius: 8px;
+	border: 1px solid var(--inputColor2);
+	padding-left: 1px;
+	padding-right: 1px;
+}
+input[type="range"]::-webkit-slider-thumb {
+	pointer-events: all;
+	border: 0px solid var(--inputColor2);
+	height: 12px;
+	width: 12px;
+	border-radius: 6px;
+	background: var(--inputColor1);
+	cursor: pointer;
+	-webkit-appearance: none;
+	margin-top: 1px;
+	transition: all 0.2s ease-out;
+}
+input[type="range"]:focus::-webkit-slider-runnable-track {
+	background: var(--inputColor3);
+}
+input[type="range"]::-moz-range-track {
+	width: 100%;
+	height: 16px;
+	cursor: pointer;
+	background: var(--inputColor3);
+	border-radius: 8px;
+	border: 1px solid var(--inputColor2);
+	padding-left: 2px;
+	padding-right: 2px;
+}
+input[type="range"]::-moz-range-thumb {
+	pointer-events: all;
+	border: 0px solid var(--inputColor2);
+	height: 12px;
+	width: 12px;
+	border-radius: 6px;
+	background: var(--inputColor1);
+	cursor: pointer;
+	margin-top: 1px;
+	transition: all 1s ease-out;
+}
+input[type="range"]::-ms-track {
+	width: 100%;
+	height: 16px;
+	cursor: pointer;
+	background: transparent;
+	border-color: transparent;
+	color: transparent;
+	padding-left: 1px;
+	padding-right: 1px;
+}
+input[type="range"]::-ms-fill-lower {
+	background: var(--inputColor3);
+	border: 1px solid var(--inputColor2);
+	border-radius: 16px;
+}
+input[type="range"]::-ms-fill-upper {
+	background: var(--inputColor3);
+	border: 1px solid var(--inputColor2);
+	border-radius: 16px;
+}
+input[type="range"]::-ms-thumb {
+	pointer-events: all;
+	border: 0px solid var(--inputColor2);
+	height: 12px;
+	width: 12px;
+	border-radius: 6px;
+	background: var(--inputColor1);
+	cursor: pointer;
+	margin-top: 1px;
+}
+input[type="range"]:focus::-ms-fill-lower {
+	background: var(--inputColor3);
+}
+input[type="range"]:focus::-ms-fill-upper {
+	background: var(--inputColor3);
+}

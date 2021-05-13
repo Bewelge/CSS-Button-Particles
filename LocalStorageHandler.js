@@ -1,6 +1,6 @@
 import { getSettingObject } from "./Settings.js"
 
-const SAVE_PATH_ROOT = "Midiano/SavedSettings"
+const SAVE_PATH_ROOT = "CssParticleButtons/SavedSettings"
 export const getGlobalSavedSettings = () => {
 	let obj = {}
 	if (window.localStorage) {
@@ -15,6 +15,7 @@ export const getGlobalSavedSettings = () => {
 export const saveCurrentSettings = () => {
 	if (window.localStorage) {
 		let saveObj = getSettingObject()
+		console.log(saveObj)
 		window.localStorage.setItem(SAVE_PATH_ROOT, JSON.stringify(saveObj))
 	}
 }

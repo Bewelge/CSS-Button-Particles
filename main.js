@@ -4,71 +4,30 @@ import {
 	getSetting,
 	setCallbackIf,
 	setGeneralSettingCallback,
-	setSetting
+	setSettingCallback
 } from "./Settings.js"
 import { paramsFromSettings, ShapeCreator } from "./ShapeCreator.js"
+import { SETTING_IDS } from "./DefaultSettings.js"
 
 var buttonRadius = 45
 var keyframes = []
-let keyframeAmount = 5
+let keyframeAmount = getSetting(SETTING_IDS.KEYFRAME_AMOUNT)
 for (let i = 0; i <= keyframeAmount; i++) [keyframes.push(i / keyframeAmount)]
 
-var shapes = [
-	// new Shape("circle", {
-	// 	positions: [
-	// 		[0, 0],
-	// 		[150, 150]
-	// 	],
-	// 	sizes: [
-	// 		[50, 50],
-	// 		[50, 50]
-	// 	],
-	// 	color: "black"
-	// }),
-	// new Shape("circle", {
-	// 	positions: [
-	// 		[0, 0],
-	// 		[150 - 12.5, 150 - 12.5]
-	// 	],
-	// 	sizes: [
-	// 		[25, 25],
-	// 		[25, 25]
-	// 	],
-	// 	color: "black"
-	// })
-]
-
-// shapes.push(
-// 	new Shape("circle", {
-// 		positions: keyframes.map(keyframe => [50, 50]),
-// 		sizes: keyframes.map(keyframe => [
-// 			100 + Math.pow(1 + keyframe * 5, 5) * 10,
-// 			100 + Math.pow(1 + keyframe * 5, 5) * 10
-// 		]),
-// 		color: "rgba(0,0,0,0.5)"
-// 	})
-// )
+var shapes = [new ShapeCreator(keyframes)]
 
 new UI()
 shapes = new ShapeCreator(keyframes, paramsFromSettings()).create()
 let cssGen = new CssGenerator(keyframes, shapes)
 cssGen.generateCss().appendStyleTagToBody()
-// generateCssString()
-
-// setSetting("particleAmount", 100)
 
 setGeneralSettingCallback(() => cssGen.generateCss().appendStyleTagToBody())
 setCallbackIf(
-	setting => setting.recreateShapes,
+	setting => setting.recreateCss,
 	() => {
 		shapes = new ShapeCreator(keyframes, paramsFromSettings()).create()
 		cssGen = new CssGenerator(keyframes, shapes)
 		cssGen.generateCss().appendStyleTagToBody()
 	}
 )
-
-// generateCssString()
-
-// function getInit
-
-function drawOnCanvas() {}
+// setSettingCallback(SETTING_IDS.BG_WIDTH)
