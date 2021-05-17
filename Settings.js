@@ -1,14 +1,26 @@
-import { getDefaultSettings } from "./DefaultSettings.js"
+import { getDefaultSettings, SETTING_TYPES } from "./DefaultSettings.js"
 import { SettingUI } from "./SettingUI.js"
 import {
 	getGlobalSavedSettings,
 	saveCurrentSettings
 } from "./LocalStorageHandler.js"
+import { getURLParams } from "./Util.js"
 
 class Settings {
 	constructor(ui) {
 		this.settings = getDefaultSettings()
 		let savedSettings = getGlobalSavedSettings()
+		this.resetCallbacks = []
+
+		let urlParams = getURLParams()
+		let entries = urlParams.entries()
+		let urlParamSettings = {}
+		let current = entries.next()
+		while (!current.done) {
+			urlParamSettings[current.value[0]] = current.value[1]
+			current = entries.next()
+		}
+		let isUrlParamsSet = Object.keys(urlParamSettings).length > 0
 
 		this.settingsById = {}
 		Object.keys(this.settings).forEach(tabId =>
@@ -16,18 +28,50 @@ class Settings {
 				this.settings[tabId][categoryId].forEach(setting => {
 					this.settingsById[setting.id] = setting
 
-					if (savedSettings.hasOwnProperty(setting.id)) {
-						if (this.settingsById[setting.id].type == "sliderMinMax") {
-							setting.lowerValue = savedSettings[setting.id].min
-							setting.upperValue = savedSettings[setting.id].max
-						} else {
-							setting.value = savedSettings[setting.id]
-						}
+					if (!isUrlParamsSet) {
+						this.setSettingsFromSaved(savedSettings, setting)
+					} else {
+						this.setSettingsFromUrlParam(urlParamSettings, setting)
 					}
 				})
 			)
 		)
+
 		this.settingsUi = new SettingUI()
+
+		this.initDependencies()
+	}
+	setSettingsFromUrlParam(urlParamSettings, setting) {
+		if (urlParamSettings.hasOwnProperty(setting.id)) {
+			if (this.settingsById[setting.id].type == SETTING_TYPES.DOUBLE_SLIDER) {
+				let min = urlParamSettings[setting.id].split("|")[0]
+				let max = urlParamSettings[setting.id].split("|")[1]
+				console.log(min, max)
+				setting.lowerValue = min
+				setting.upperValue = max
+			} else {
+				setting.value = urlParamSettings[setting.id]
+			}
+		}
+	}
+	setSettingsFromSaved(savedSettings, setting) {
+		if (savedSettings.hasOwnProperty(setting.id)) {
+			if (this.settingsById[setting.id].type == SETTING_TYPES.DOUBLE_SLIDER) {
+				setting.lowerValue = savedSettings[setting.id].min
+				setting.upperValue = savedSettings[setting.id].max
+			} else {
+				setting.value = savedSettings[setting.id]
+			}
+		}
+	}
+
+	initDependencies() {
+		this.showIfDependees = new Set(
+			Object.keys(this.settingsById)
+				.map(id => this.settingsById[id])
+				.filter(setting => setting.hasOwnProperty("showIfDependee"))
+				.map(setting => setting.showIfDependee)
+		)
 	}
 	setSettingValue(settingId, value) {
 		this.settingsById[settingId].value = value
@@ -35,6 +79,18 @@ class Settings {
 }
 
 const globalSettings = new Settings()
+
+export const initSettingDependencies = () => {
+	globalSettings.showIfDependees.forEach(dep => {
+		checkDependencies(dep)
+	})
+}
+export const getAllCssSettings = () => {
+	return Object.keys(globalSettings.settingsById).filter(
+		settingId =>
+			globalSettings.settingsById[settingId].type == SETTING_TYPES.CSS_COLOR
+	)
+}
 export const getSetting = settingId => {
 	if (globalSettings == null) {
 		globalSettings = new Settings()
@@ -61,9 +117,28 @@ export const setSetting = (settingId, value) => {
 	if (settingCallbacks.hasOwnProperty(settingId)) {
 		settingCallbacks[settingId].forEach(callback => callback())
 	}
+	if (globalSettings.showIfDependees.has(settingId)) {
+		checkDependencies(settingId)
+	}
 	settingGeneralCallbacks.forEach(callback => callback())
 
 	saveCurrentSettings()
+}
+function checkDependencies(settingId) {
+	let deps = getDependentsOf(settingId)
+	let settingsShowHideList = deps.map(aSettingId => [
+		aSettingId,
+		globalSettings.settingsById[aSettingId].showIf(
+			globalSettings.settingsById[settingId].value
+		)
+	])
+	globalSettings.settingsUi.showHideSettings(settingsShowHideList)
+}
+function getDependentsOf(settingId) {
+	return Object.keys(globalSettings.settingsById).filter(
+		aSettingId =>
+			globalSettings.settingsById[aSettingId].showIfDependee === settingId
+	)
 }
 export const getSettingsDiv = () => {
 	return globalSettings.settingsUi.getSettingsDiv(globalSettings.settings)
@@ -110,7 +185,14 @@ export const resetSettingsToDefault = () => {
 	Object.keys(defaultSettings).forEach(tabId =>
 		Object.keys(defaultSettings[tabId]).forEach(categoryId =>
 			defaultSettings[tabId][categoryId].forEach(setting => {
-				globalSettings.settingsById[setting.id].value = setting.value
+				if (isSettingMinMaxSlider(setting.id)) {
+					globalSettings.settingsById[setting.id].upperValue =
+						setting.upperValue
+					globalSettings.settingsById[setting.id].lowerValue =
+						setting.lowerValue
+				} else {
+					globalSettings.settingsById[setting.id].value = setting.value
+				}
 			})
 		)
 	)
@@ -123,14 +205,37 @@ export const resetSettingsToDefault = () => {
 	)
 	globalSettings.settingsUi.mainDiv = null
 	parent.appendChild(getSettingsDiv())
+	globalSettings.resetCallbacks.forEach(callback => callback())
+	saveCurrentSettings()
+}
+
+export const addResetCallback = callback => {
+	globalSettings.resetCallbacks.push(callback)
 }
 
 function isSettingMinMaxSlider(settingId) {
 	return (
 		globalSettings.settingsById.hasOwnProperty(settingId) &&
-		globalSettings.settingsById[settingId].type == "sliderMinMax"
+		globalSettings.settingsById[settingId].type == SETTING_TYPES.DOUBLE_SLIDER
 	)
 }
 function parseFloatIfNotNaN(num) {
 	return !isNaN(parseFloat(num)) ? parseFloat(num) : num
+}
+
+export const createParameterStringWithSettings = () => {
+	return (
+		window.location.origin +
+		"?" +
+		Object.keys(globalSettings.settingsById)
+			.map(settingId => {
+				let setting = globalSettings.settingsById[settingId]
+				let val =
+					setting.type == SETTING_TYPES.DOUBLE_SLIDER
+						? setting.lowerValue + "|" + setting.upperValue
+						: setting.value
+				return encodeURIComponent(settingId + "=" + val)
+			})
+			.join("&")
+	)
 }

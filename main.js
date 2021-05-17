@@ -1,7 +1,9 @@
 import { UI } from "./UI.js"
-import { CssGenerator } from "./CssGenerator.js"
+import { generateAndAppendCss, getCssGenerator } from "./CssGenerator.js"
 import {
+	addResetCallback,
 	getSetting,
+	initSettingDependencies,
 	setCallbackIf,
 	setGeneralSettingCallback,
 	setSettingCallback
@@ -9,25 +11,34 @@ import {
 import { paramsFromSettings, ShapeCreator } from "./ShapeCreator.js"
 import { SETTING_IDS } from "./DefaultSettings.js"
 
-var buttonRadius = 45
 var keyframes = []
 let keyframeAmount = getSetting(SETTING_IDS.KEYFRAME_AMOUNT)
 for (let i = 0; i <= keyframeAmount; i++) [keyframes.push(i / keyframeAmount)]
 
-var shapes = [new ShapeCreator(keyframes)]
+var shapes = []
 
 new UI()
 shapes = new ShapeCreator(keyframes, paramsFromSettings()).create()
-let cssGen = new CssGenerator(keyframes, shapes)
-cssGen.generateCss().appendStyleTagToBody()
+getCssGenerator().setData(keyframes, shapes)
+generateAndAppendCss()
 
-setGeneralSettingCallback(() => cssGen.generateCss().appendStyleTagToBody())
+setGeneralSettingCallback(() => generateAndAppendCss())
+addResetCallback(() => {
+	getCssGenerator().setData(keyframes, shapes)
+	generateAndAppendCss()
+})
 setCallbackIf(
 	setting => setting.recreateCss,
 	() => {
+		keyframes = []
+		let keyframeAmount = getSetting(SETTING_IDS.KEYFRAME_AMOUNT)
+		for (let i = 0; i <= keyframeAmount; i++) {
+			;[keyframes.push(i / keyframeAmount)]
+		}
 		shapes = new ShapeCreator(keyframes, paramsFromSettings()).create()
-		cssGen = new CssGenerator(keyframes, shapes)
-		cssGen.generateCss().appendStyleTagToBody()
+		getCssGenerator().setData(keyframes, shapes)
+		generateAndAppendCss()
 	}
 )
+initSettingDependencies()
 // setSettingCallback(SETTING_IDS.BG_WIDTH)

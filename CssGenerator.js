@@ -1,8 +1,14 @@
+import { getCssStringForShape } from "./CssShapes.js"
 import { SETTING_IDS } from "./DefaultSettings.js"
-import { getSetting } from "./Settings.js"
+import { getAllCssSettings, getSetting, getSettingObject } from "./Settings.js"
+import { getCssVariable, replaceAllString } from "./Util.js"
 
-export class CssGenerator {
+class CssGenerator {
 	constructor(keyframes, shapes) {
+		this.keyframes = keyframes
+		this.shapes = shapes
+	}
+	setData(keyframes, shapes) {
 		this.keyframes = keyframes
 		this.shapes = shapes
 	}
@@ -10,6 +16,7 @@ export class CssGenerator {
 		this.bgImageString = this.getBgImageString()
 		this.keyframesString = this.getKeyframeString()
 		this.buttonStyleString = this.getButtonStyleString()
+		// this.progrBarStyleString = this.getProgressBarKeyframeString()
 
 		return this
 
@@ -25,45 +32,30 @@ export class CssGenerator {
 		let btnHt = getSetting(SETTING_IDS.BUTTON_HEIGHT)
 		let btnEffectWd = getSetting(SETTING_IDS.BG_WIDTH)
 		let btnEffectHt = getSetting(SETTING_IDS.BG_HEIGHT)
-		return (
-			".buttonEffect::after {" +
-			"left:" +
-			-1 * (btnEffectWd / 2 - btnWd / 2) +
-			"px;" +
-			"top:" +
-			-1 * (btnEffectHt / 2 - btnHt / 2) +
-			"px;" +
-			"min-width:" +
-			btnEffectWd +
-			"px;" +
-			"min-height:" +
-			btnEffectHt +
-			"px;" +
-			"}" +
-			".button { width: " +
-			btnWd +
-			"px; height: " +
-			btnHt +
-			"px;" +
-			"background:" +
-			getSetting(SETTING_IDS.BG_COLOR) +
-			";left: " +
-			(btnEffectWd / 2 - btnWd / 2) +
-			"px;top:" +
-			(btnEffectHt / 2 - btnHt / 2) +
-			"px;" +
-			"}" +
-			".buttonWrap {width:" +
-			btnEffectWd +
-			"px;height:" +
-			btnEffectHt +
-			"px;}"
-		)
+		return getCssStringFromObj({
+			".buttonEffect::after": {
+				left: -1 * (btnEffectWd / 2 - btnWd / 2) + "px",
+				top: -1 * (btnEffectHt / 2 - btnHt / 2) + "px",
+				"min-width": btnEffectWd + "px",
+				"min-height": btnEffectHt + "px"
+			},
+			".button": {
+				width: btnWd + "px",
+				height: btnHt + "px",
+				// background: getSetting(SETTING_IDS.BG_COLOR),
+				// color: getSetting(SETTING_IDS.FONT_COLOR),
+				"border-radius": getSetting(SETTING_IDS.BUTTON_BORDER_RADIUS) + "%"
+			},
+			".buttonWrap": {
+				width: Math.min(window.innerWidth, btnEffectWd) + "px",
+				height: Math.min(400, btnEffectHt) + "px"
+			}
+		})
 	}
 	getBgImageString() {
 		let bgImageString = ".animated::after {background-image: "
 		this.shapes.forEach((shape, shapeIndex) => {
-			bgImageString += this.getBgImageShapeString(shape)
+			bgImageString += getCssStringForShape(shape)
 			if (shapeIndex < this.shapes.length - 1) {
 				bgImageString += ","
 			}
@@ -93,6 +85,23 @@ export class CssGenerator {
 		return styleTag
 	}
 
+	// getProgressBarKeyframeString() {
+	// 	let keyframesString = "@keyframes progrBarAnim {"
+	// 	this.keyframes.forEach((keyframe, index) => {
+	// 		let perc = Math.floor(keyframe * 1000) / 10
+	// 		keyframesString += perc + "% {"
+	// 		keyframesString += "background-size: " + perc + "% 100%"
+	// 		keyframesString += "}"
+	// 	})
+	// 	keyframesString += "}"
+	// 	return (
+	// 		keyframesString +
+	// 		".progrBarAnimated {animation: progrBarAnim linear " +
+	// 		getSetting(SETTING_IDS.ANIMATION_DURATION) +
+	// 		"s forwards; }"
+	// 	)
+	// }
+
 	getKeyframeString() {
 		let animationName = "bubbles1"
 		let keyframesString = "@keyframes " + animationName + " {"
@@ -110,6 +119,7 @@ export class CssGenerator {
 	getBgSizeString(keyframeIndex) {
 		let sizeString = "background-size: "
 		this.shapes.forEach((shape, index) => {
+			// console.log(shape.sizes[keyframeIndex])
 			sizeString +=
 				shape.sizes[keyframeIndex][0] +
 				"px " +
@@ -137,45 +147,6 @@ export class CssGenerator {
 		posString += ";"
 		return posString
 	}
-	getBgImageShapeString(shape) {
-		let circlePercent = 45
-		let trapezPercent = 20
-		let trapezDegree = 45
-		let str = ""
-		if (shape.type == "circle") {
-			str +=
-				"radial-gradient(circle, " +
-				// " transparent " +
-				// (circlePercent - 5) +
-				// "%, " +
-				shape.color +
-				" " +
-				circlePercent +
-				"%, transparent " +
-				(circlePercent + 5) +
-				"%)"
-		} else if (shape.type == "rectangle") {
-			str += "linear-gradient(" + shape.color + "," + shape.color + ")"
-		} else if (shape.type == "trapez") {
-			str +=
-				"linear-gradient( " +
-				trapezDegree +
-				"deg, transparent " +
-				trapezPercent +
-				"%, " +
-				shape.color +
-				" " +
-				trapezPercent +
-				"%, " +
-				shape.color +
-				" " +
-				(100 - trapezPercent) +
-				"%, transparent " +
-				(100 - trapezPercent) +
-				"% )"
-		}
-		return str
-	}
 }
 
 function wrapInStyleTag(styleString) {
@@ -190,4 +161,64 @@ function getRandomColor() {
 	let colors = [100, 100, 200]
 	colors.sort((a, b) => Math.random() - Math.random())
 	return "rgba(" + colors[0] + "," + colors[1] + "," + colors[2] + ")"
+}
+
+const theCssGen = new CssGenerator([], [])
+
+export const getCssGenerator = () => {
+	return theCssGen
+}
+
+export const generateAndAppendCss = () => {
+	theCssGen.generateCss().appendStyleTagToBody()
+}
+
+export const getHtmlTemplateString = async () => {
+	let textContent = ""
+	let templateString = await fetch("template.txt")
+		.then(response => response.text())
+		.then(text => (textContent = text))
+
+	let rootVarsString = ":root { \n"
+	getAllCssSettings().forEach(setting => {
+		rootVarsString += "--" + setting + ": " + getCssVariable(setting) + "; \n"
+	})
+	rootVarsString += "}"
+	textContent = replaceAllString(textContent, "#ROOTVARS#", rootVarsString)
+
+	return textContent.replace(
+		"#STYLE_PLACEHOLDER#",
+		theCssGen.bgImageString +
+			" \n" +
+			theCssGen.keyframesString +
+			" \n" +
+			theCssGen.buttonStyleString
+	)
+}
+
+const newLine = "\n"
+const tab = "    "
+/**
+ * Builds a css string from an object in the shape of
+ * {
+ * 		selector :
+ * 			{
+ * 				cssAttributeName : cssAttributeValue,
+ * 				...
+ * 			},
+ * 		...
+ * }
+ *
+ * @param {the css selectors + parameters} obj
+ */
+function getCssStringFromObj(obj) {
+	let str = ""
+	Object.keys(obj).forEach(selector => {
+		str += selector + " {" + newLine
+		Object.entries(obj[selector]).forEach(nameValuePair => {
+			str += tab + nameValuePair[0] + ": " + nameValuePair[1] + ";" + newLine
+		})
+		str += "}" + newLine
+	})
+	return str
 }

@@ -1,15 +1,18 @@
 import { SETTING_IDS } from "./DefaultSettings.js"
 import { getSetting } from "./Settings.js"
-import { getCssVariable, getRange } from "./Util.js"
+import { angle, dist, getRange } from "./Util.js"
+import { SHAPE_TYPES } from "./CssShapes.js"
+import { resetRng, rng } from "./Rng.js"
 class Shape {
-	constructor(type, opts) {
-		this.type = type
-		if (this.type == "circle") {
-		}
-		this.positions = opts.positions
-		this.sizes = opts.sizes
+	constructor(opts) {
+		this.type = opts.shapeType || SHAPE_TYPES.CIRCLE
+		this.positions = opts.positions || []
+		this.sizes = opts.sizes || []
 
 		this.color = opts.color || "black"
+		// if (type == SHAPE_TYPES.LINE) {
+		this.degree = Math.floor(rng() * 360)
+		// }
 	}
 }
 
@@ -17,12 +20,14 @@ export class ShapeCreator {
 	constructor(keyframes, params) {
 		this.params = params
 		this.keyframes = keyframes
+		resetRng()
 	}
 	create() {
 		let p = this.params
 		let shapes = []
 		for (let i = 0; i < p.particleAmount; i++) {
 			let {
+				spawnAngle,
 				startAngle,
 				momentum,
 				startRadius,
@@ -32,17 +37,24 @@ export class ShapeCreator {
 				rotChange
 			} = this.getRandomParams(p)
 
-			let isAngleSpreadEvenly = getSetting(SETTING_IDS.ANGLE_SPREAD_EVENLY)
-			let rot = isAngleSpreadEvenly
-				? p.startAngle.min + (i / p.particleAmount) * getRange(p.startAngle)
-				: startAngle
-			let startX =
-				getSetting(SETTING_IDS.BG_WIDTH) / 2 + Math.cos(rot) * startRadius
-			let startY =
-				getSetting(SETTING_IDS.BG_HEIGHT) / 2 + Math.sin(rot) * startRadius
+			let rotChangeInRad = (rotChange * Math.PI) / 180
+			const shapeType = getSetting(SETTING_IDS.SHAPE_TYPE)
 
-			let motX = Math.cos(rot) * momentum
-			let motY = Math.sin(rot) * momentum
+			spawnAngle = getStartRotation(p, i, spawnAngle)
+			let spawnAngleInRad = (spawnAngle * Math.PI) / 180
+			let startAngleInRad = (startAngle * Math.PI) / 180
+
+			let direction = spawnAngleInRad + startAngleInRad
+
+			let startX =
+				getSetting(SETTING_IDS.BG_WIDTH) / 2 +
+				Math.cos(spawnAngleInRad) * startRadius
+			let startY =
+				getSetting(SETTING_IDS.BG_HEIGHT) / 2 +
+				Math.sin(spawnAngleInRad) * startRadius
+
+			let motX = Math.cos(direction) * momentum
+			let motY = Math.sin(direction) * momentum
 
 			let positions = []
 			let sizes = []
@@ -50,15 +62,23 @@ export class ShapeCreator {
 			let y = startY
 
 			let sizeX = startSizeX
-			let sizeY = startSizeY
+			let sizeY = sizeX
 
 			this.keyframes.forEach((keyframe, keyframeIndex) => {
-				positions.push([Math.floor(x - sizeX / 2), Math.floor(y - sizeY / 2)])
+				let { xAdjust, yAdjust } = getPositionAdjustments(
+					shapeType,
+					sizeY,
+					sizeX
+				)
+
+				positions.push([
+					Math.floor(x - sizeX / 2) + xAdjust,
+					Math.floor(y - sizeY / 2) + yAdjust
+				])
+
 				sizes.push([Math.floor(sizeX), Math.floor(sizeY)])
+
 				for (
-					// let j = this.keyframes[keyframeIndex - 1] || 0;
-					// j < (keyframe * 1) / this.keyframes.length;
-					// j++
 					let j = 0;
 					j < getSetting(SETTING_IDS.SIMULATIONS_PER_KEYFRAME);
 					j++
@@ -66,29 +86,62 @@ export class ShapeCreator {
 					const friction = 1 - getSetting(SETTING_IDS.FRICTION)
 					motX *= friction
 					motY *= friction
-					motX = Math.cos(rot) * momentum
-					motY = Math.sin(rot) * momentum
-					motY -= getSetting(SETTING_IDS.GRAVITY) / 10
-					momentum *= friction
+					// momentum *= friction
 
-					sizeX = Math.max(0, sizeX - sizeChange / 5)
-					sizeY = sizeX
-					// sizeChange *= 1.1
+					let thrust = getSetting(SETTING_IDS.THRUST)
+					motX += Math.cos(direction) * thrust * 10
+					motY += Math.sin(direction) * thrust * 10
 
-					rot += rotChange
-					rotChange *= 1 - getSetting(SETTING_IDS.ANGULAR_FRICTION)
-					// rotChange *= 1.5
-					// rotChange = rotChangeChange(rotChange) * 0.0001
+					motY -=
+						(getSetting(SETTING_IDS.GRAVITY) * Math.sqrt(sizeX * sizeY)) / 100
+
+					let angToMiddle = angle(
+						x,
+						y,
+						getSetting(SETTING_IDS.BG_WIDTH) / 2,
+						getSetting(SETTING_IDS.BG_HEIGHT) / 2
+					)
+					let disToMiddle = dist(
+						x,
+						y,
+						getSetting(SETTING_IDS.BG_WIDTH) / 2,
+						getSetting(SETTING_IDS.BG_HEIGHT) / 2
+					)
+					motX +=
+						(Math.cos(angToMiddle) *
+							getSetting(SETTING_IDS.GRAVITY_TOWARDS_BUTTON) *
+							100) /
+						Math.pow(
+							Math.max(getSetting(SETTING_IDS.BUTTON_WIDTH) / 2, disToMiddle),
+							2
+						)
+					motY +=
+						(Math.sin(angToMiddle) *
+							getSetting(SETTING_IDS.GRAVITY_TOWARDS_BUTTON) *
+							100) /
+						Math.pow(
+							Math.max(getSetting(SETTING_IDS.BUTTON_HEIGHT) / 2, disToMiddle),
+							2
+						)
+
+					sizeX = Math.max(0, sizeX * sizeChange)
+					sizeY =
+						shapeType == SHAPE_TYPES.LINE
+							? sizeY
+							: Math.max(0, sizeY * sizeChange)
+
+					direction += rotChangeInRad
+					rotChangeInRad *= 1 - getSetting(SETTING_IDS.ANGULAR_FRICTION)
 
 					x += motX
 					y += motY
 				}
 			})
-			// positions[positions.length - 1] = positions[positions.length - 1]
-			// sizes[sizes.length - 1] = [0, 0]
-			let color = getCssVariable("buttonColor1") //"rgba(12,91,131," + (0.6 + Math.random() * 0.4) + ")" //"#90a4ae7a" //"rgba(0,0,0," + Math.random() + ")" //getRandomColor()
 
-			let rndShape = new Shape("trapez", {
+			let color = getSetting(SETTING_IDS.PARTICLE_COLOR)
+
+			let rndShape = new Shape({
+				shapeType,
 				positions,
 				sizes,
 				color
@@ -100,6 +153,7 @@ export class ShapeCreator {
 	}
 
 	getRandomParams(p) {
+		let spawnAngle = getRandomInRange(p.spawnAngle.min, p.spawnAngle.max)
 		let startAngle = getRandomInRange(p.startAngle.min, p.startAngle.max)
 
 		let startSizeX = getRandomInRange(p.startSize.min, p.startSize.max)
@@ -113,6 +167,7 @@ export class ShapeCreator {
 
 		let momentum = getRandomInRange(p.speed.min, p.speed.max)
 		return {
+			spawnAngle,
 			startAngle,
 			momentum,
 			startRadius,
@@ -127,6 +182,7 @@ export class ShapeCreator {
 export const paramsFromSettings = () => {
 	return {
 		particleAmount: getSetting(SETTING_IDS.PARTICLE_AMOUNT),
+		spawnAngle: getSetting(SETTING_IDS.SPAWN_ANGLE), // 0,
 		startAngle: getSetting(SETTING_IDS.START_ANGLE), // 0,
 		startSize: getSetting(SETTING_IDS.START_SIZE), // 0,
 		startRadius: getSetting(SETTING_IDS.START_RADIUS), // 0,
@@ -136,6 +192,26 @@ export const paramsFromSettings = () => {
 	}
 }
 
+function getPositionAdjustments(shapeType, sizeY, sizeX) {
+	let xAdjust = 0
+	let yAdjust = 0
+	if (shapeType == SHAPE_TYPES.HALF_CIRCLE) {
+		yAdjust = Math.floor(sizeY) / 4
+	} else if (shapeType == SHAPE_TYPES.TRIANGLE) {
+		xAdjust = -Math.floor(sizeX) / 4
+		yAdjust = +Math.floor(sizeY) / 4
+	}
+	return { xAdjust, yAdjust }
+}
+
+function getStartRotation(p, i, spawnAngle) {
+	let isAngleSpreadEvenly = getSetting(SETTING_IDS.ANGLE_SPREAD_EVENLY)
+	return isAngleSpreadEvenly
+		? p.spawnAngle.min +
+				Math.max(0, (i + 1) / p.particleAmount) * getRange(p.spawnAngle)
+		: spawnAngle
+}
+
 function getRandomInRange(min, max) {
-	return min + Math.random() * Math.max(0, max - min)
+	return min + rng() * Math.max(0, max - min)
 }

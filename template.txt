@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+    
+            #ROOTVARS#
+
+
+            .buttonWrap {
+                z-index: 1;
+                position: relative;
+                width: 400px;
+                height: 400px;
+            
+            }
+            
+            .button {
+                z-index: 1;
+                color: var(--buttonFontColor);
+                padding: 0em;
+                position: absolute;
+                width: 90px;
+                height: 90px;
+                left: 50%;
+                top: 50%;
+                background-color: unset;
+                background: var(--buttonColor0);
+                pointer-events: none;
+                border-radius: 50%;
+                border-width: 0px;
+                box-sizing: border-box;
+                transition: box-shadow ease-out 0.3s;
+                box-shadow: 0px 0px 0px 5px var(--buttonColor2),
+                    0px 0px 0px 9px var(--buttonColor1),
+                    inset 0px 0px 0px 0px var(--buttonColor2);
+            }
+
+            .buttonEffect:hover:not(:active) ~ .button {
+                    transition: 0.1s ease-in-out all;
+                    box-shadow: 0px 0px 0px 8px var(--buttonColor2),
+                        0px 0px 0px 14px var(--buttonColor1),
+                        inset 0px 0px 0px 0px var(--buttonColor2);
+            }
+
+            .buttonEffect {
+                    z-index: -1;
+                    background: none !important;
+                    pointer-events: all;
+                    cursor: pointer;
+                    box-shadow: none;
+            }
+            .buttonEffect::after {
+                    position: absolute;
+                    content: "";
+                    left: -105px;
+                    top: -105px;
+                    min-width: 300px;
+                    min-height: 300px;
+                    pointer-events: none;
+                    transition: background-size ease-in-out 0.5s,
+                        background-position ease-in-out 0.5s;
+                    background-repeat: no-repeat;
+            }
+
+            .buttonEffect:active ~ .button {
+                    transition: box-shadow ease-out 0.1s, background-size ease-in-out 0.1s,
+                        background-position ease-in-out 0.1s;
+                    box-shadow: 0px 0px 0px 0px var(--buttonColor2),
+                        0px 0px 0px 5px var(--buttonColor1),
+                        inset 0px 0px 0px 5px var(--buttonColor2);
+                    transform: scale(0.9, 0.9);
+            }
+            .buttonEffect:active::after {
+                    animation: none;
+                    background-size: 0;
+            }
+
+
+
+        </style>
+        <style>
+            #STYLE_PLACEHOLDER#
+        </style>
+    </head>
+    <body>
+    
+        <div class='buttonWrao'>
+            <div class='button buttonEffect'></div>
+            <button id='theButton' class='button'>Click me</button>
+        </div>
+        <script>
+            let btn = document.querySelector(".buttonEffect")
+            let initalListener = () => {
+				document.querySelector(".buttonEffect").classList.add("animated")
+				btn.removeEventListener("click", initalListener)
+			}
+			btn.addEventListener("click", initalListener)
+        </script>
+    </body>
+</html>

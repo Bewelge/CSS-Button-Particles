@@ -86,7 +86,7 @@ function drawRoundRect(ctx, x, y, width, height, radius, isRounded) {
 }
 
 function replaceAllString(text, replaceThis, withThat) {
-	return text.replace(new RegExp(replaceThis, "g"), withThat)
+	return text.replace(new RegExp(replaceThis, "g", "m"), withThat)
 }
 
 function groupArrayBy(arr, keyFunc) {
@@ -286,6 +286,9 @@ function getCssVariable(aVarName) {
 		"--" + aVarName
 	)
 }
+function setCssVariable(aVarName, value) {
+	document.documentElement.style.setProperty("--" + aVarName, value)
+}
 function distPoints(point1, point2) {
 	try {
 		return dist(point1.x, point1.y, point2.x, point2.y)
@@ -351,6 +354,11 @@ function getRange(p) {
 	return p.max - p.min
 }
 
+function getURLParams() {
+	const queryString = window.location.search
+	return new URLSearchParams(decodeURIComponent(queryString))
+}
+
 export {
 	formatTime,
 	arrayContains,
@@ -362,6 +370,7 @@ export {
 	roundToDecimals,
 	nFormatter,
 	getCssVariable,
+	setCssVariable,
 	distPoints,
 	dist,
 	anglePoints,
@@ -369,5 +378,6 @@ export {
 	compareAngles,
 	turnTowards,
 	findSideToTurn,
-	getRange
+	getRange,
+	getURLParams
 }

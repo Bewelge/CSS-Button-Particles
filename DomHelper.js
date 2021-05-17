@@ -48,9 +48,9 @@ export class DomHelper {
 			{ id: id + "container", className: "sliderContainer" }
 		)
 		let labelDiv = DomHelper.createElement(
-			"label",
+			"div",
 			{},
-			{ id: id + "label", className: "sliderLabel", innerHTML: label }
+			{ id: id + "label", className: "settingLabel", innerHTML: label }
 		)
 		let slider = DomHelper.createSlider(id, val, min, max, step, onChange)
 		cont.appendChild(labelDiv)
@@ -83,10 +83,11 @@ export class DomHelper {
 			{ id: id + "container", className: "sliderContainer" }
 		)
 		let labelDiv = DomHelper.createElement(
-			"label",
+			"div",
 			{},
-			{ id: id + "label", className: "sliderLabel", innerHTML: label }
+			{ id: id + "label", className: "settingLabel", innerHTML: label }
 		)
+		let sliderWrap = DomHelper.createDivWithClass("sliderWrap")
 		let slider = DomHelper.createSlider(
 			id,
 			val,
@@ -95,9 +96,10 @@ export class DomHelper {
 			step,
 			onChangeInternal
 		)
+		sliderWrap.appendChild(slider)
 		cont.appendChild(labelDiv)
 		cont.appendChild(displayDiv)
-		cont.appendChild(slider)
+		cont.appendChild(sliderWrap)
 
 		return { slider: slider, container: cont }
 	}
@@ -120,8 +122,7 @@ export class DomHelper {
 			{
 				id: id + "Field",
 				className: "sliderVal",
-				innerHTML:
-					roundToDecimals(lowerVal, 0) + " - > " + roundToDecimals(upperVal, 0)
+				innerHTML: lowerVal + " < - > " + upperVal
 			}
 		)
 
@@ -160,9 +161,9 @@ export class DomHelper {
 			{ id: id + "container", className: "sliderContainer" }
 		)
 		let labelDiv = DomHelper.createElement(
-			"label",
+			"div",
 			{},
-			{ id: id + "label", className: "sliderLabel", innerHTML: label }
+			{ id: id + "label", className: "settingLabel", innerHTML: label }
 		)
 		minSlider = DomHelper.createSlider(
 			id,
@@ -172,6 +173,7 @@ export class DomHelper {
 			step,
 			minOnChange
 		)
+		DomHelper.addClassToElement("minSlider", minSlider)
 		maxSlider = DomHelper.createSlider(
 			id,
 			upperVal,
@@ -181,10 +183,14 @@ export class DomHelper {
 			maxOnChange
 		)
 		DomHelper.addClassToElements("doubleSlider", [minSlider, maxSlider])
+		DomHelper.addClassToElement("maxSlider", maxSlider)
+		let sliderWrap = DomHelper.createDivWithClass("sliderWrap")
+
 		cont.appendChild(labelDiv)
 		cont.appendChild(displayDiv)
-		cont.appendChild(minSlider)
-		cont.appendChild(maxSlider)
+		sliderWrap.appendChild(minSlider)
+		sliderWrap.appendChild(maxSlider)
+		cont.appendChild(sliderWrap)
 
 		return { slider: minSlider, sliderMax: maxSlider, container: cont }
 	}
@@ -259,15 +265,55 @@ export class DomHelper {
 		el.value = val
 		return el
 	}
-	static createTextInput(onChange, styles, attributes) {
-		attributes = attributes || {}
+	static createTextArea(id, label, value, onChange, rows) {
+		let cont = DomHelper.createDivWithClass("inputCont")
+		let attributes = {}
+		attributes.id = id
+		const input = DomHelper.createElement("textArea", {}, attributes)
+		input.onchange = ev => {
+			onChange(input.value)
+		}
+		input.value = value
+		// input.setAttribute("rows", rows)
+
+		let labelEl = DomHelper.createElementWithClass(
+			"settingLabel",
+			"div",
+			{},
+			{ innerHTML: label, for: id }
+		)
+
+		labelEl.setAttribute("for", id)
+		cont.appendChild(labelEl)
+		cont.appendChild(input)
+		return cont
+	}
+	static createTextInput(id, label, value, onChange) {
+		let cont = DomHelper.createDivWithClass("inputCont")
+		let attributes = {}
+		attributes.id = id
 		attributes.type = "text"
-		attributes.onchange = onChange
-		return DomHelper.createElement("input", styles, attributes)
+		const input = DomHelper.createElement("input", {}, attributes)
+		input.onchange = ev => {
+			onChange(input.value)
+		}
+		input.value = value
+
+		let labelEl = DomHelper.createElementWithClass(
+			"label",
+			"div",
+			{},
+			{ innerHTML: label, for: id }
+		)
+
+		labelEl.setAttribute("for", id)
+		cont.appendChild(labelEl)
+		cont.appendChild(input)
+		return cont
 	}
 	static createCheckbox(text, onChange, value, isChecked) {
 		let id = replaceAllString(text, " ", "") + "checkbox"
-		let cont = DomHelper.createDivWithIdAndClass(id, "checkboxCont")
+		let cont = DomHelper.createDivWithIdAndClass(id, "checkboxContainer")
 		let checkbox = DomHelper.createElementWithClass("checkboxInput", "input")
 		checkbox.setAttribute("type", "checkbox")
 		checkbox.checked = value
@@ -275,8 +321,8 @@ export class DomHelper {
 		checkbox.onchange = onChange
 
 		let label = DomHelper.createElementWithClass(
-			"checkboxlabel",
-			"label",
+			"settingLabel checkboxLabel",
+			"div",
 			{},
 			{ innerHTML: text, for: id }
 		)
@@ -398,8 +444,8 @@ export class DomHelper {
 	static createInputSelect(title, items, value, callback) {
 		let selectBox = DomHelper.createDivWithId(title)
 		let label = DomHelper.createElementWithClass(
-			"inputSelectLabel",
-			"label",
+			"settingLabel inputSelectLabel",
+			"div",
 			{},
 			{ innerHTML: title }
 		)
@@ -487,7 +533,7 @@ export class DomHelper {
 	 * @param {Function} onChange  A color string of the newly selected color will be passed as argument
 	 */
 	static createColorPickerText(text, startColor, onChange) {
-		let cont = DomHelper.createDivWithClass("settingContainer")
+		let cont = DomHelper.createDivWithClass("settingContainer colorContainer")
 
 		let label = DomHelper.createDivWithClass(
 			"colorLabel settingLabel",
@@ -536,6 +582,41 @@ export class DomHelper {
 				.toString()
 			onChange(color.toRGBA().toString())
 		})
+
+		return cont
+	}
+	static hideDiv(div) {
+		// if (div) {
+		div.classList.add("hidden")
+		div.classList.remove("unhidden")
+		// }
+	}
+	static showDiv(div) {
+		// if (div) {
+		div.classList.remove("hidden")
+		div.classList.add("unhidden")
+		// }
+	}
+
+	static createCodeBox(codeStr) {
+		let cont = DomHelper.createDivWithClass("codeBoxCont")
+
+		let header = DomHelper.createDivWithClass("codeHeader")
+		header.innerHTML = "PHP"
+
+		let box = DomHelper.createDivWithClass("codeBox")
+
+		let codeTag = DomHelper.createElement("code")
+		codeTag.setAttribute("data-language", "html")
+
+		let preTag = DomHelper.createElement("pre")
+		preTag.innerHTML = codeStr
+		codeTag.appendChild(preTag)
+
+		box.appendChild(codeTag)
+
+		cont.appendChild(header)
+		cont.appendChild(box)
 
 		return cont
 	}

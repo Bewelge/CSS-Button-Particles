@@ -1,21 +1,28 @@
 .settingsWrap {
 	z-index: 100;
 }
+.hidden {
+	visibility: hidden;
+	opacity: 0;
+	pointer-events: none;
+}
+.unhidden {
+	visibility: visible;
+	opacity: 1;
+}
 .settingsContainer {
-	width: 200px;
 	overflow-y: hidden;
 	overflow-x: hidden;
 }
 
 .settingsTabButtonContainer {
-	background-color: var(--innerMenuBgColor);
+	background-color: var(--bg1);
 	width: 100%;
 	top: 0;
 	left: 0;
 	height: 2em;
 	display: flex;
 	justify-content: space-between;
-	position: absolute;
 }
 
 .settingsTabButton {
@@ -33,14 +40,22 @@
 	overflow-y: auto;
 	overflow-x: hidden;
 	margin-top: 2em;
-	display: none;
-	height: calc(100% - 2em);
+	padding: 2em;
+
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
 }
 .settingsTabContentContainer button {
 	margin: 1.5em;
+	max-height: 2em;
 }
 .settingsGroupContainer {
-	border-top: 2px solid var(--borderColor);
+	/* border-top: 2px solid var(--borderColor); */
+	min-width: 400px;
+
+	z-index: 5;
+	margin: 5px;
 }
 
 .settingsGroupContainer:first-of-type {
@@ -48,19 +63,50 @@
 }
 .settingsGroupLabel {
 	font-size: 1em;
-	padding-left: 0.5em;
-	padding-top: 0.5em;
-	padding-bottom: 0.5em;
+	padding: 16px 8px 20px;
 	color: var(--fontColor);
+	border: 2px solid var(--borderColor);
+	background-color: var(--bg2);
+}
+.checkboxContainer,
+.colorContainer {
+	cursor: pointer;
 }
 .settingContainer {
-	padding-top: 0.5em;
-	padding-bottom: 0.5em;
+	background-color: var(--bg3);
+	padding: 16px 8px 20px;
 	width: 100%;
+	min-height: 45px;
 	box-sizing: border-box;
-	background-color: var(--innerMenuBgColor);
-	transition: 0.2s all ease-out;
+	background-repeat: no-repeat;
+	transition: 0s all ease-out;
+	display: flow-root;
+	border-right: 1px solid var(--borderColor);
+	border-left: 1px solid var(--borderColor);
+	border-bottom: 1px solid var(--borderColor);
+}
+.settingLabel {
+	color: var(--fontColor);
+	z-index: 15;
+	pointer-events: none;
+	font-size: 0.75rem;
+	-ms-user-select: none; /* Internet Explorer/Edge */
+	user-select: none;
+	float: left;
+	/* padding: 16px 8px 20px; */
+	box-sizing: border-box;
 }
 .settingContainer:hover {
-	background-color: var(--lightInnerMenuHoverBgColor);
+	transition: 0.1s all linear;
+	/* background-color: rgba(0, 0, 0, 0.2); */
+
+	/* animation: bgFillOnFloat 0.3s; */
+	/* background-color: var(--bg2); */
+}
+
+@keyframes bgFillOnFloat {
+	0% {
+	}
+	100% {
+	}
 }

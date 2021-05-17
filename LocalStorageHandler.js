@@ -15,7 +15,6 @@ export const getGlobalSavedSettings = () => {
 export const saveCurrentSettings = () => {
 	if (window.localStorage) {
 		let saveObj = getSettingObject()
-		console.log(saveObj)
 		window.localStorage.setItem(SAVE_PATH_ROOT, JSON.stringify(saveObj))
 	}
 }
