@@ -109,6 +109,19 @@ function loadJson(url, callback) {
 	request.send(null)
 }
 
+function getScrollbarWidth() {
+	let div = document.createElement("div")
+	div.style.visibility = "hidden"
+	div.style.overflow = "scroll"
+	div.style.msOverflowStyle = "scrollbar"
+	document.body.appendChild(div)
+	let inner = document.createElement("div")
+	div.appendChild(inner)
+	let wd = div.offsetWidth - inner.offsetWidth
+	div.parentNode.removeChild(div)
+	return wd
+}
+
 function iOS() {
 	return (
 		[
@@ -379,5 +392,6 @@ export {
 	turnTowards,
 	findSideToTurn,
 	getRange,
-	getURLParams
+	getURLParams,
+	getScrollbarWidth
 }

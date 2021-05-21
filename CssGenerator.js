@@ -3,6 +3,10 @@ import { SETTING_IDS } from "./DefaultSettings.js"
 import { getAllCssSettings, getSetting, getSettingObject } from "./Settings.js"
 import { getCssVariable, replaceAllString } from "./Util.js"
 
+const NEWLINE = "\n"
+const TAB = "    "
+const ANIMATION_NAME = "CssParticleButton"
+
 class CssGenerator {
 	constructor(keyframes, shapes) {
 		this.keyframes = keyframes
@@ -17,15 +21,6 @@ class CssGenerator {
 		this.keyframesString = this.getKeyframeString()
 		this.buttonStyleString = this.getButtonStyleString()
 		// this.progrBarStyleString = this.getProgressBarKeyframeString()
-
-		return this
-
-		// let initalBgPosString = "background-position: "
-		// keyframes.forEach((keyframe, keyframeIndex) => {
-		// 	shapes.forEach((shape, shapeIndex) => {
-		// 		// bgImageString += getBgImageShapeString(shape)
-		// 	})
-		// })
 	}
 	getButtonStyleString() {
 		let btnWd = getSetting(SETTING_IDS.BUTTON_WIDTH)
@@ -44,7 +39,7 @@ class CssGenerator {
 				height: btnHt + "px",
 				// background: getSetting(SETTING_IDS.BG_COLOR),
 				// color: getSetting(SETTING_IDS.FONT_COLOR),
-				"border-radius": getSetting(SETTING_IDS.BUTTON_BORDER_RADIUS) + "%"
+				"border-radius": getSetting(SETTING_IDS.BUTTON_BORDER_RADIUS) + "px"
 			},
 			".buttonWrap": {
 				width: Math.min(window.innerWidth, btnEffectWd) + "px",
@@ -52,18 +47,29 @@ class CssGenerator {
 			}
 		})
 	}
-	getBgImageString() {
-		let bgImageString = ".animated::after {background-image: "
+	getBgImageString(formatted) {
+		let newline = formatted ? NEWLINE : ""
+		let tab = formatted ? TAB : ""
+		let bgImageString =
+			".animated::after { " + newline + tab + " background-image: "
 		this.shapes.forEach((shape, shapeIndex) => {
-			bgImageString += getCssStringForShape(shape)
+			bgImageString += newline + tab + tab + getCssStringForShape(shape)
 			if (shapeIndex < this.shapes.length - 1) {
 				bgImageString += ","
 			}
 		})
 		bgImageString +=
-			"; animation: bubbles1 linear " +
+			";" +
+			newline +
+			tab +
+			tab +
+			"animation: " +
+			ANIMATION_NAME +
+			" linear " +
 			getSetting(SETTING_IDS.ANIMATION_DURATION) +
-			"s forwards;}"
+			"s forwards;" +
+			newline +
+			"}"
 
 		return bgImageString
 	}
@@ -102,15 +108,39 @@ class CssGenerator {
 	// 	)
 	// }
 
-	getKeyframeString() {
-		let animationName = "bubbles1"
-		let keyframesString = "@keyframes " + animationName + " {"
-		this.keyframes.forEach((keyframe, index) => {
-			keyframesString += Math.floor(keyframe * 1000) / 10 + "% {"
+	getKeyframeString(formated) {
+		let newline = formated ? "\n" : ""
+		let tab = formated ? "    " : ""
 
-			keyframesString += this.getBgSizeString(index)
-			keyframesString += this.getBgPositionString(index)
-			keyframesString += "}"
+		let transformRotate = 0
+		let transformRotatePerKeyframe = getSetting(SETTING_IDS.TRANSFORM_ROTATE)
+		let transformScaleX = 100
+		let transformScaleY = 100
+		let transformScaleXPerKeyframe = getSetting(SETTING_IDS.TRANSFORM_SCALE_X)
+		let transformScaleYPerKeyframe = getSetting(SETTING_IDS.TRANSFORM_SCALE_Y)
+
+		let keyframesString = "@keyframes " + ANIMATION_NAME + " {"
+		this.keyframes.forEach((keyframe, index) => {
+			const percent = Math.floor(keyframe * 1000) / 10
+			keyframesString += newline + tab + percent + "% {" + newline
+
+			keyframesString +=
+				tab +
+				tab +
+				"transform: rotate(" +
+				transformRotate +
+				"deg) scale(" +
+				transformScaleX / 100 +
+				"," +
+				transformScaleY / 100 +
+				");" +
+				newline
+			keyframesString += tab + tab + this.getBgSizeString(index) + newline
+			keyframesString += tab + tab + this.getBgPositionString(index) + newline
+			keyframesString += tab + "}"
+			transformRotate += transformRotatePerKeyframe
+			transformScaleX += transformScaleXPerKeyframe
+			transformScaleY += transformScaleYPerKeyframe
 		})
 		keyframesString += "}"
 		// console.log(keyframesString)
@@ -156,21 +186,26 @@ function wrapInStyleTag(styleString) {
 	return styleEl
 }
 
-function getRandomColor() {
-	let sign = Math.sign(Math.random() - Math.random())
-	let colors = [100, 100, 200]
-	colors.sort((a, b) => Math.random() - Math.random())
-	return "rgba(" + colors[0] + "," + colors[1] + "," + colors[2] + ")"
-}
-
 const theCssGen = new CssGenerator([], [])
 
 export const getCssGenerator = () => {
 	return theCssGen
 }
-
-export const generateAndAppendCss = () => {
-	theCssGen.generateCss().appendStyleTagToBody()
+var lastGenerated = window.performance.now()
+export const generateAndAppendCss = retry => {
+	if (window.performance.now() - lastGenerated < 250 && !retry) {
+		window.setTimeout(() => {
+			generateAndAppendCss(true)
+		}, 250)
+	} else {
+		lastGenerated = window.performance.now()
+		theCssGen.generateCss()
+		theCssGen.appendStyleTagToBody()
+		document.getElementById("keyframesCss").querySelector("pre").innerHTML =
+			theCssGen.getKeyframeString(getSetting(SETTING_IDS.KEYFRAME_COMPACT))
+		document.getElementById("bgImgCss").querySelector("pre").innerHTML =
+			theCssGen.getBgImageString(getSetting(SETTING_IDS.BG_IMG_COMPACT))
+	}
 }
 
 export const getHtmlTemplateString = async () => {
@@ -196,8 +231,6 @@ export const getHtmlTemplateString = async () => {
 	)
 }
 
-const newLine = "\n"
-const tab = "    "
 /**
  * Builds a css string from an object in the shape of
  * {
@@ -214,11 +247,11 @@ const tab = "    "
 function getCssStringFromObj(obj) {
 	let str = ""
 	Object.keys(obj).forEach(selector => {
-		str += selector + " {" + newLine
+		str += selector + " {" + NEWLINE
 		Object.entries(obj[selector]).forEach(nameValuePair => {
-			str += tab + nameValuePair[0] + ": " + nameValuePair[1] + ";" + newLine
+			str += TAB + nameValuePair[0] + ": " + nameValuePair[1] + ";" + NEWLINE
 		})
-		str += "}" + newLine
+		str += "}" + NEWLINE
 	})
 	return str
 }

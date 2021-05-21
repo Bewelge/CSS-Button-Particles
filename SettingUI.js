@@ -81,11 +81,15 @@ export class SettingUI {
 			"settingsTabContentContainer settingsTabContent" + tabName
 		)
 
-		Object.keys(settingGroups).forEach(groupId => {
-			cont.appendChild(
-				this.createSettingGroupDiv(tabName, groupId, settingGroups[groupId])
+		Object.keys(settingGroups)
+			.filter(
+				grp => settingGroups[grp].filter(setting => !setting.hidden).length > 0
 			)
-		})
+			.forEach(groupId => {
+				cont.appendChild(
+					this.createSettingGroupDiv(tabName, groupId, settingGroups[groupId])
+				)
+			})
 		return cont
 	}
 	getResetButton() {

@@ -1,5 +1,18 @@
-.settingsWrap {
-	z-index: 100;
+:root {
+	--scrollBarWidth: 16px;
+
+	--scrollBarHeight: 16px;
+}
+
+.hiddenScrollBarDiv {
+	width: calc(100% - 60px);
+	height: 100%;
+	padding-right: calc(40px + var(--scrollBarWidth));
+	padding-left: 20px;
+	/* padding-bottom: var(--scrollBarHeight); */
+	overflow-y: scroll;
+	overflow-x: scroll;
+	box-sizing: content-box;
 }
 .hidden {
 	visibility: hidden;
@@ -52,7 +65,9 @@
 }
 .settingsGroupContainer {
 	/* border-top: 2px solid var(--borderColor); */
-	min-width: 400px;
+	border-radius: 2px;
+	width: 400px;
+	max-width: 80%;
 
 	z-index: 5;
 	margin: 5px;
@@ -72,7 +87,8 @@
 .colorContainer {
 	cursor: pointer;
 }
-.settingContainer {
+.settingsGroupContainer .settingContainer {
+	border-radius: 2px;
 	background-color: var(--bg3);
 	padding: 16px 8px 20px;
 	width: 100%;

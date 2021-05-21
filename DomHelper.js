@@ -597,27 +597,99 @@ export class DomHelper {
 		div.classList.add("unhidden")
 		// }
 	}
+	static createHiddenScrollBar() {}
 
-	static createCodeBox(codeStr) {
-		let cont = DomHelper.createDivWithClass("codeBoxCont")
+	static initDoubleSliders() {
+		//TODO Fix&Cleanup
+		document.querySelectorAll(".minSlider").forEach(el => {
+			let maxSlider = el.parentElement.querySelector(".maxSlider")
 
-		let header = DomHelper.createDivWithClass("codeHeader")
-		header.innerHTML = "PHP"
+			let maxGrabbed = false
+			window.addEventListener("mouseup touchend", () => (maxGrabbed = false))
+			el.addEventListener("mousedown touchstart", ev => {
+				// let maxSliderPos =
+				// 	((parseFloat(maxSlider.value) - parseFloat(maxSlider.min)) /
+				// 		(parseFloat(maxSlider.max) - parseFloat(maxSlider.min))) *
+				// 	el.clientWidth
+				// let minSliderPos =
+				// 	((parseFloat(minSlider.value) - parseFloat(minSlider.min)) /
+				// 		(parseFloat(minSlider.max) - parseFloat(minSlider.min))) *
+				// 	el.clientWidth
 
-		let box = DomHelper.createDivWithClass("codeBox")
+				const mouseX = ev.clientX - el.getBoundingClientRect().left
+				let valAtMouse =
+					parseFloat(maxSlider.min) +
+					(parseFloat(maxSlider.max) - parseFloat(maxSlider.min)) *
+						(mouseX / el.clientWidth)
 
-		let codeTag = DomHelper.createElement("code")
-		codeTag.setAttribute("data-language", "html")
+				if (valAtMouse - el.value > maxSlider.value - valAtMouse) {
+					ev.preventDefault()
+					let valAtMouse =
+						parseFloat(maxSlider.min) +
+						(parseFloat(maxSlider.max) - parseFloat(maxSlider.min)) *
+							(mouseX / el.clientWidth)
+					maxSlider.value = valAtMouse
+					maxGrabbed = true
+					var event = new Event("input", {
+						bubbles: true,
+						cancelable: true
+					})
+					maxSlider.dispatchEvent(event)
+				}
+			})
+			let mouseMoveListener = ev => {
+				if (maxGrabbed) {
+					const mouseX = ev.clientX - el.getBoundingClientRect().left
+					let valAtMouse =
+						parseFloat(maxSlider.min) +
+						(parseFloat(maxSlider.max) - parseFloat(maxSlider.min)) *
+							(mouseX / el.clientWidth)
+					maxSlider.value = valAtMouse
 
-		let preTag = DomHelper.createElement("pre")
-		preTag.innerHTML = codeStr
-		codeTag.appendChild(preTag)
+					var event = new Event("input", {
+						bubbles: true,
+						cancelable: true
+					})
+					maxSlider.dispatchEvent(event)
+					//TODO For IE:
+					//var event = document.createEvent('Event');
+					// event.initEvent('input', true, true);
 
-		box.appendChild(codeTag)
+					// elem.dispatchEvent(event);
+				}
+			}
+			window.addEventListener("mousemove", ev => {
+				mouseMoveListener(ev)
+			})
 
-		cont.appendChild(header)
-		cont.appendChild(box)
+			// el.addEventListener("click", ev => {
+			// 	// ev.preventDefault()
+			// 	console.log(ev.target)
+			// 	let maxSliderPos =
+			// 		((parseFloat(maxSlider.value) - parseFloat(maxSlider.min)) /
+			// 			(parseFloat(maxSlider.max) - parseFloat(maxSlider.min))) *
+			// 		el.clientWidth
 
-		return cont
+			// 	const mouseX = ev.clientX - el.getBoundingClientRect().left
+			// 	if (mouseX > maxSliderPos) {
+			// 	}
+
+			// 	let valAtMouse =
+			// 		parseFloat(maxSlider.min) +
+			// 		(parseFloat(maxSlider.max) - parseFloat(maxSlider.min)) *
+			// 			(mouseX / el.clientWidth)
+			// 	console.log(ev)
+			// 	console.log(ev.clientX - el.getBoundingClientRect().left)
+			// 	console.log(el.clientWidth)
+			// })
+		})
+	}
+	static getElementAsHtmlString(el) {
+		let outer = document.createElement("div")
+		let elsClone = el.cloneNode(false)
+		outer.appendChild(elsClone)
+		let str = outer.innerHTML
+		outer.removeChild(elsClone)
+		return str
 	}
 }

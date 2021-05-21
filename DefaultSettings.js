@@ -71,10 +71,52 @@ export const SETTING_IDS = {
 	BG_COLOR: "buttonColor0",
 	BTN_COLOR_1: "buttonColor1",
 	BTN_COLOR_2: "buttonColor2",
-	BTN_FONT_COLOR: "buttonFontColor"
+	BTN_FONT_COLOR: "buttonFontColor",
+
+	TRANSFORM_ROTATE: "transRot",
+	TRANSFORM_SCALE_X: "transScaX",
+	TRANSFORM_SCALE_Y: "transScaY",
+
+	KEYFRAME_COMPACT: "keyCmpct",
+	BG_IMG_COMPACT: "bgImgCmpct"
 }
 const defaultSettings = {
 	General: {
+		"Background Transforms": [
+			{
+				type: SETTING_TYPES.SLIDER,
+				id: SETTING_IDS.TRANSFORM_ROTATE,
+				label: "Rotation change per keyframe",
+				value: 0,
+				min: -90,
+				max: 90,
+				step: 1,
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.TRANSFORM_ROTATE, value)
+			},
+			{
+				type: SETTING_TYPES.SLIDER,
+				id: SETTING_IDS.TRANSFORM_SCALE_X,
+				label: "Scale-X - % change per keyframe",
+				value: 0,
+				min: -100,
+				max: 100,
+				step: 1,
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.TRANSFORM_SCALE_X, value)
+			},
+			{
+				type: SETTING_TYPES.SLIDER,
+				id: SETTING_IDS.TRANSFORM_SCALE_Y,
+				label: "Scale-Y - % change per keyframe",
+				value: 0,
+				min: -100,
+				max: 100,
+				step: 1,
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.TRANSFORM_SCALE_Y, value)
+			}
+		],
 		"Css Animation": [
 			{
 				type: SETTING_TYPES.SLIDER,
@@ -399,7 +441,7 @@ const defaultSettings = {
 				label: "Border Radius",
 				value: 50,
 				min: 0,
-				max: 50,
+				max: 150,
 				step: 1,
 				recreateCss: false,
 				onChange: value => setSetting(SETTING_IDS.BUTTON_BORDER_RADIUS, value)
@@ -459,6 +501,28 @@ const defaultSettings = {
 				step: 1,
 				recreateCss: true,
 				onChange: value => setSetting(SETTING_IDS.BG_HEIGHT, value)
+			}
+		],
+		Hidden: [
+			{
+				hidden: true,
+				type: SETTING_TYPES.CHECKBOX,
+				id: SETTING_IDS.BG_IMG_COMPACT,
+				label: "Formatted",
+				value: true,
+				recreateCss: false,
+				onChange: event =>
+					setSetting(SETTING_IDS.BG_IMG_COMPACT, event.target.checked)
+			},
+			{
+				hidden: true,
+				type: SETTING_TYPES.CHECKBOX,
+				id: SETTING_IDS.KEYFRAME_COMPACT,
+				label: "Formatted",
+				value: true,
+				recreateCss: false,
+				onChange: event =>
+					setSetting(SETTING_IDS.KEYFRAME_COMPACT, event.target.checked)
 			}
 		]
 	}

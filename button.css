@@ -4,23 +4,27 @@
 	--buttonColor2: white;
 	--buttonColor3: #90a4ae8f;
 	--buttonFontColor: white;
+	--buttonFontSize: 16px;
 }
 .button {
 	z-index: 1;
 	color: var(--buttonFontColor);
 	padding: 0em;
+	font-size: var(--buttonFontSize);
 	position: absolute;
 	width: 90px;
 	height: 90px;
 	left: 50%;
 	top: 50%;
+	transform: translate(-50%, -50%) scale(1, 1);
+
 	background-color: unset;
 	background: var(--buttonColor0);
 	pointer-events: none;
 	border-radius: 50%;
 	border-width: 0px;
 	box-sizing: border-box;
-	transition: box-shadow ease-out 0.3s;
+	transition: box-shadow ease-out 0.3s, transform 0.1s ease-in;
 	box-shadow: 0px 0px 0px 5px var(--buttonColor2),
 		0px 0px 0px 9px var(--buttonColor1),
 		inset 0px 0px 0px 0px var(--buttonColor2);
@@ -30,6 +34,8 @@
 	box-shadow: 0px 0px 0px 8px var(--buttonColor2),
 		0px 0px 0px 14px var(--buttonColor1),
 		inset 0px 0px 0px 0px var(--buttonColor2);
+
+	transform: translate(-50%, -50%) scale(0.95, 0.95);
 }
 .buttonEffect {
 	z-index: -1;
@@ -49,6 +55,7 @@
 	transition: background-size ease-in-out 0.5s,
 		background-position ease-in-out 0.5s;
 	background-repeat: no-repeat;
+	overflow: hidden;
 }
 
 .buttonEffect:active ~ .button {
@@ -57,7 +64,8 @@
 	box-shadow: 0px 0px 0px 0px var(--buttonColor2),
 		0px 0px 0px 5px var(--buttonColor1),
 		inset 0px 0px 0px 5px var(--buttonColor2);
-	transform: scale(0.9, 0.9);
+
+	transform: translate(-50%, -50%) scale(0.9, 0.9);
 }
 .buttonEffect:active::after {
 	animation: none;

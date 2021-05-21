@@ -26,7 +26,7 @@ const SHAPES = [
 			" " +
 			circlePercent +
 			"%, transparent " +
-			(circlePercent + 25) +
+			(circlePercent + 0) +
 			"%)"
 	},
 	{

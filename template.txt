@@ -12,6 +12,11 @@
             #ROOTVARS#
 
 
+            
+            html,body {
+                overflow:hidden;
+            }
+
             .buttonWrap {
                 z-index: 1;
                 position: relative;
@@ -21,65 +26,70 @@
             }
             
             .button {
-                z-index: 1;
-                color: var(--buttonFontColor);
-                padding: 0em;
-                position: absolute;
-                width: 90px;
-                height: 90px;
-                left: 50%;
-                top: 50%;
-                background-color: unset;
-                background: var(--buttonColor0);
-                pointer-events: none;
-                border-radius: 50%;
-                border-width: 0px;
-                box-sizing: border-box;
-                transition: box-shadow ease-out 0.3s;
-                box-shadow: 0px 0px 0px 5px var(--buttonColor2),
-                    0px 0px 0px 9px var(--buttonColor1),
-                    inset 0px 0px 0px 0px var(--buttonColor2);
-            }
+	z-index: 1;
+	color: var(--buttonFontColor);
+	padding: 0em;
+	font-size: var(--buttonFontSize);
+	position: absolute;
+	width: 90px;
+	height: 90px;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%) scale(1, 1);
 
-            .buttonEffect:hover:not(:active) ~ .button {
-                    transition: 0.1s ease-in-out all;
-                    box-shadow: 0px 0px 0px 8px var(--buttonColor2),
-                        0px 0px 0px 14px var(--buttonColor1),
-                        inset 0px 0px 0px 0px var(--buttonColor2);
-            }
+	background-color: unset;
+	background: var(--buttonColor0);
+	pointer-events: none;
+	border-radius: 50%;
+	border-width: 0px;
+	box-sizing: border-box;
+	transition: box-shadow ease-out 0.3s, transform 0.1s ease-in;
+	box-shadow: 0px 0px 0px 5px var(--buttonColor2),
+		0px 0px 0px 9px var(--buttonColor1),
+		inset 0px 0px 0px 0px var(--buttonColor2);
+}
+.buttonEffect:hover:not(:active) ~ .button {
+	transition: 0.1s ease-in-out all;
+	box-shadow: 0px 0px 0px 8px var(--buttonColor2),
+		0px 0px 0px 14px var(--buttonColor1),
+		inset 0px 0px 0px 0px var(--buttonColor2);
 
-            .buttonEffect {
-                    z-index: -1;
-                    background: none !important;
-                    pointer-events: all;
-                    cursor: pointer;
-                    box-shadow: none;
-            }
-            .buttonEffect::after {
-                    position: absolute;
-                    content: "";
-                    left: -105px;
-                    top: -105px;
-                    min-width: 300px;
-                    min-height: 300px;
-                    pointer-events: none;
-                    transition: background-size ease-in-out 0.5s,
-                        background-position ease-in-out 0.5s;
-                    background-repeat: no-repeat;
-            }
+	transform: translate(-50%, -50%) scale(0.95, 0.95);
+}
+.buttonEffect {
+	z-index: -1;
+	background: none !important;
+	pointer-events: all;
+	cursor: pointer;
+	box-shadow: none;
+}
+.buttonEffect::after {
+	position: absolute;
+	content: "";
+	left: -105px;
+	top: -105px;
+	min-width: 300px;
+	min-height: 300px;
+	pointer-events: none;
+	transition: background-size ease-in-out 0.5s,
+		background-position ease-in-out 0.5s;
+	background-repeat: no-repeat;
+	overflow: hidden;
+}
 
-            .buttonEffect:active ~ .button {
-                    transition: box-shadow ease-out 0.1s, background-size ease-in-out 0.1s,
-                        background-position ease-in-out 0.1s;
-                    box-shadow: 0px 0px 0px 0px var(--buttonColor2),
-                        0px 0px 0px 5px var(--buttonColor1),
-                        inset 0px 0px 0px 5px var(--buttonColor2);
-                    transform: scale(0.9, 0.9);
-            }
-            .buttonEffect:active::after {
-                    animation: none;
-                    background-size: 0;
-            }
+.buttonEffect:active ~ .button {
+	transition: box-shadow ease-out 0.1s, background-size ease-in-out 0.1s,
+		background-position ease-in-out 0.1s;
+	box-shadow: 0px 0px 0px 0px var(--buttonColor2),
+		0px 0px 0px 5px var(--buttonColor1),
+		inset 0px 0px 0px 5px var(--buttonColor2);
+
+	transform: translate(-50%, -50%) scale(0.9, 0.9);
+}
+.buttonEffect:active::after {
+	animation: none;
+	background-size: 0;
+}
 
 
 

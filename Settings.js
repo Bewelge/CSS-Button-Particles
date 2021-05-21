@@ -124,6 +124,10 @@ export const setSetting = (settingId, value) => {
 
 	saveCurrentSettings()
 }
+
+export const getASettingDiv = settingId => {
+	return SettingUI.createSettingDiv(globalSettings.settingsById[settingId])
+}
 function checkDependencies(settingId) {
 	let deps = getDependentsOf(settingId)
 	let settingsShowHideList = deps.map(aSettingId => [

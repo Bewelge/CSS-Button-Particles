@@ -15,10 +15,7 @@ var keyframes = []
 let keyframeAmount = getSetting(SETTING_IDS.KEYFRAME_AMOUNT)
 for (let i = 0; i <= keyframeAmount; i++) [keyframes.push(i / keyframeAmount)]
 
-var shapes = []
-
-new UI()
-shapes = new ShapeCreator(keyframes, paramsFromSettings()).create()
+var shapes = new ShapeCreator(keyframes, paramsFromSettings()).create()
 getCssGenerator().setData(keyframes, shapes)
 generateAndAppendCss()
 
@@ -33,12 +30,13 @@ setCallbackIf(
 		keyframes = []
 		let keyframeAmount = getSetting(SETTING_IDS.KEYFRAME_AMOUNT)
 		for (let i = 0; i <= keyframeAmount; i++) {
-			;[keyframes.push(i / keyframeAmount)]
+			keyframes.push(i / keyframeAmount)
 		}
 		shapes = new ShapeCreator(keyframes, paramsFromSettings()).create()
 		getCssGenerator().setData(keyframes, shapes)
 		generateAndAppendCss()
 	}
 )
+new UI()
 initSettingDependencies()
 // setSettingCallback(SETTING_IDS.BG_WIDTH)
