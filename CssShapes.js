@@ -173,7 +173,7 @@ export const getCssStringForShape = shape => {
 		//Custom doesnt need a function
 	}
 	if (shape.type == SHAPE_TYPES.RECTANGLE) {
-		str += cssStringFunc(shape.color) //"linear-gradient(" + shape.color + "," + shape.color + ")"
+		str += cssStringFunc(shape.color)
 	} else if (shape.type == SHAPE_TYPES.PARALLELOGRAM) {
 		str += cssStringFunc(shape.color, trapezPercent, trapezDegree)
 	} else if (shape.type == SHAPE_TYPES.CIRCLE) {

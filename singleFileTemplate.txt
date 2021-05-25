@@ -13,19 +13,29 @@
 
 
             
-            html,body {
-                overflow:hidden;
-            }
+          html,body {
+    overflow:hidden;
+    width: 100%;
+    height: 100%;
+}
+body  {
+	display: flex;
+    align-content: space-around;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
+}
 
-            .buttonWrap {
-                z-index: 1;
-                position: relative;
-                width: 400px;
-                height: 400px;
+          .buttonWrap {
+	z-index: 1;
+	position: relative;
+	width: 400px;
+	height: 400px;
+	max-width: 50%;
+}
             
-            }
-            
-            .button {
+.particleButton {
 	z-index: 1;
 	color: var(--buttonFontColor);
 	padding: 0em;
@@ -39,7 +49,8 @@
 
 	background-color: unset;
 	background: var(--buttonColor0);
-	pointer-events: none;
+	pointer-events: all;
+	cursor: pointer;
 	border-radius: 50%;
 	border-width: 0px;
 	box-sizing: border-box;
@@ -48,7 +59,7 @@
 		0px 0px 0px 9px var(--buttonColor1),
 		inset 0px 0px 0px 0px var(--buttonColor2);
 }
-.buttonEffect:hover:not(:active) ~ .button {
+.particleButton:hover:not(:active) {
 	transition: 0.1s ease-in-out all;
 	box-shadow: 0px 0px 0px 8px var(--buttonColor2),
 		0px 0px 0px 14px var(--buttonColor1),
@@ -56,14 +67,14 @@
 
 	transform: translate(-50%, -50%) scale(0.95, 0.95);
 }
-.buttonEffect {
+.particles {
 	z-index: -1;
 	background: none !important;
-	pointer-events: all;
+	pointer-events: none;
 	cursor: pointer;
 	box-shadow: none;
 }
-.buttonEffect::after {
+.particles::after {
 	position: absolute;
 	content: "";
 	left: -105px;
@@ -77,7 +88,7 @@
 	overflow: hidden;
 }
 
-.buttonEffect:active ~ .button {
+.particleButton:active {
 	transition: box-shadow ease-out 0.1s, background-size ease-in-out 0.1s,
 		background-position ease-in-out 0.1s;
 	box-shadow: 0px 0px 0px 0px var(--buttonColor2),
@@ -86,7 +97,7 @@
 
 	transform: translate(-50%, -50%) scale(0.9, 0.9);
 }
-.buttonEffect:active::after {
+.particleButton:active ~ .particles::after {
 	animation: none;
 	background-size: 0;
 }
@@ -100,17 +111,19 @@
     </head>
     <body>
     
-        <div class='buttonWrao'>
-            <div class='button buttonEffect'></div>
-            <button id='theButton' class='button'>Click me</button>
+        <div class='buttonWrap'>
+            <button class='particleButton'>Click me</button>
+            <div class='particleButton particles'></div>
         </div>
         <script>
-            let btn = document.querySelector(".buttonEffect")
-            let initalListener = () => {
-				document.querySelector(".buttonEffect").classList.add("animated")
-				btn.removeEventListener("click", initalListener)
-			}
-			btn.addEventListener("click", initalListener)
+            document.querySelectorAll("button.particleButton").forEach(btn => {
+				let btnBg = btn.parentNode.querySelector(".particles")
+				let initalListener = () => {
+					btnBg.classList.add("animated")
+					btn.removeEventListener("click", initalListener)
+				}
+				btn.addEventListener("click", initalListener)
+			})
         </script>
     </body>
 </html>

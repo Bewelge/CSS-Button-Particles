@@ -5,19 +5,22 @@
 }
 
 .hiddenScrollBarDiv {
-	width: calc(100% - 60px);
+	width: calc(100% + var(--scrollBarWidth));
 	height: 100%;
-	padding-right: calc(40px + var(--scrollBarWidth));
+	padding-right: calc(40px - var(--scrollBarWidth));
 	padding-left: 20px;
 	/* padding-bottom: var(--scrollBarHeight); */
 	overflow-y: scroll;
 	overflow-x: scroll;
-	box-sizing: content-box;
+	box-sizing: border-box;
 }
 .hidden {
 	visibility: hidden;
 	opacity: 0;
 	pointer-events: none;
+}
+.gone {
+	display: none !important;
 }
 .unhidden {
 	visibility: visible;
@@ -37,7 +40,9 @@
 	display: flex;
 	justify-content: space-between;
 }
-
+#settingsResetButton {
+	margin: 2em;
+}
 .settingsTabButton {
 	flex: 1 1 auto;
 	height: 2em;
@@ -53,7 +58,6 @@
 	overflow-y: auto;
 	overflow-x: hidden;
 	margin-top: 2em;
-	padding: 2em;
 
 	display: flex;
 	justify-content: center;
@@ -67,10 +71,10 @@
 	/* border-top: 2px solid var(--borderColor); */
 	border-radius: 2px;
 	width: 400px;
-	max-width: 80%;
-
+	max-width: 95%;
 	z-index: 5;
 	margin: 5px;
+	user-select: none;
 }
 
 .settingsGroupContainer:first-of-type {
@@ -80,8 +84,10 @@
 	font-size: 1em;
 	padding: 16px 8px 20px;
 	color: var(--fontColor);
-	border: 2px solid var(--borderColor);
+	/* border: 2px solid var(--borderColor); */
 	background-color: var(--bg2);
+	border-radius: 6px 6px 0px 0px;
+	user-select: none;
 }
 .checkboxContainer,
 .colorContainer {

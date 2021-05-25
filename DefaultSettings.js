@@ -25,6 +25,7 @@ export const SETTING_TYPES = {
 	CHECKBOX: "checkbox",
 	COLOR: "color",
 	CSS_COLOR: "cssColor",
+	CSS_NUMBER: "cssNum",
 	DOUBLE_SLIDER: "doubleSlider",
 	TEXT_INPUT: "textInput",
 	TEXT_AREA: "textArea"
@@ -72,32 +73,60 @@ export const SETTING_IDS = {
 	BTN_COLOR_1: "buttonColor1",
 	BTN_COLOR_2: "buttonColor2",
 	BTN_FONT_COLOR: "buttonFontColor",
+	BTN_FONT_SIZE: "buttonFontSize",
 
-	TRANSFORM_ROTATE: "transRot",
+	TRANSFORM_ROTATE_Z: "transRotZ",
+	TRANSFORM_ROTATE_X: "transRotX",
+	TRANSFORM_ROTATE_Y: "transRotY",
 	TRANSFORM_SCALE_X: "transScaX",
 	TRANSFORM_SCALE_Y: "transScaY",
+	TRANSFORM_SCALE_CONSTANT: "transScaConst",
 
 	KEYFRAME_COMPACT: "keyCmpct",
-	BG_IMG_COMPACT: "bgImgCmpct"
+	BG_IMG_COMPACT: "bgImgCmpct",
+	COMPLETE_COMPACT: "cmplCmpct",
+	BUTTON_NAME: "btnName"
 }
 const defaultSettings = {
 	General: {
 		"Background Transforms": [
 			{
 				type: SETTING_TYPES.SLIDER,
-				id: SETTING_IDS.TRANSFORM_ROTATE,
-				label: "Rotation change per keyframe",
+				id: SETTING_IDS.TRANSFORM_ROTATE_X,
+				label: "X-Rotation change per keyframe",
 				value: 0,
 				min: -90,
 				max: 90,
 				step: 1,
 				recreateCss: true,
-				onChange: value => setSetting(SETTING_IDS.TRANSFORM_ROTATE, value)
+				onChange: value => setSetting(SETTING_IDS.TRANSFORM_ROTATE_X, value)
+			},
+			{
+				type: SETTING_TYPES.SLIDER,
+				id: SETTING_IDS.TRANSFORM_ROTATE_Y,
+				label: "Y-Rotation change per keyframe",
+				value: 0,
+				min: -90,
+				max: 90,
+				step: 1,
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.TRANSFORM_ROTATE_Y, value)
+			},
+			{
+				type: SETTING_TYPES.SLIDER,
+				id: SETTING_IDS.TRANSFORM_ROTATE_Z,
+				label: "Z-Rotation change per keyframe",
+				value: 0,
+				min: -90,
+				max: 90,
+				step: 1,
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.TRANSFORM_ROTATE_Z, value)
 			},
 			{
 				type: SETTING_TYPES.SLIDER,
 				id: SETTING_IDS.TRANSFORM_SCALE_X,
-				label: "Scale-X - % change per keyframe",
+				label: "Scale-X (% change per keyframe)",
 				value: 0,
 				min: -100,
 				max: 100,
@@ -108,13 +137,25 @@ const defaultSettings = {
 			{
 				type: SETTING_TYPES.SLIDER,
 				id: SETTING_IDS.TRANSFORM_SCALE_Y,
-				label: "Scale-Y - % change per keyframe",
+				label: "Scale-Y (% change per keyframe)",
 				value: 0,
 				min: -100,
 				max: 100,
 				step: 1,
 				recreateCss: true,
 				onChange: value => setSetting(SETTING_IDS.TRANSFORM_SCALE_Y, value)
+			},
+			{
+				type: SETTING_TYPES.SLIDER,
+				id: SETTING_IDS.TRANSFORM_SCALE_CONSTANT,
+				label: "Constant scale  (%)",
+				value: 100,
+				min: -500,
+				max: 500,
+				step: 1,
+				recreateCss: true,
+				onChange: value =>
+					setSetting(SETTING_IDS.TRANSFORM_SCALE_CONSTANT, value)
 			}
 		],
 		"Css Animation": [
@@ -152,8 +193,19 @@ const defaultSettings = {
 				onChange: value => setSetting(SETTING_IDS.KEYFRAME_AMOUNT, value)
 			}
 		],
-		"Particle Shape": [
-			,
+
+		Particles: [
+			{
+				type: SETTING_TYPES.SLIDER,
+				id: SETTING_IDS.PARTICLE_AMOUNT,
+				label: "Particle amount",
+				value: 20,
+				min: 1,
+				max: 250,
+				step: 1,
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.PARTICLE_AMOUNT, value)
+			},
 			{
 				type: SETTING_TYPES.LIST,
 				id: SETTING_IDS.SHAPE_TYPE,
@@ -163,6 +215,18 @@ const defaultSettings = {
 				recreateCss: true,
 				onChange: val => setSetting(SETTING_IDS.SHAPE_TYPE, val),
 				subSettings: []
+			},
+			{
+				type: SETTING_TYPES.COLOR,
+				showIfDependee: SETTING_IDS.SHAPE_TYPE,
+				showIf: value => {
+					return value != SHAPE_TYPES.CUSTOM
+				},
+				id: SETTING_IDS.PARTICLE_COLOR,
+				label: "Particle color",
+				value: "#0c5b8371",
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.PARTICLE_COLOR, value)
 			},
 			{
 				type: SETTING_TYPES.TEXT_AREA,
@@ -177,93 +241,8 @@ const defaultSettings = {
 				update: () => {},
 				recreateCss: true,
 				onChange: value => setSetting(SETTING_IDS.SHAPE_STRING, value)
-			}
-			// {
-			// 	type: SETTING_TYPES.COLOR,
-			// 	showIfDependee: SETTING_IDS.SHAPE_TYPE,
-			// 	showIf: value => {
-			// 		// value == SHAPE_TYPES.CIRCLE
-			// 		return true
-			// 	},
-			// 	id: SETTING_IDS.SHAPE_COLOR1,
-			// 	label: "Particle color 1",
-			// 	value: getCssVariable("buttonColor1"),
-			// 	recreateCss: true,
-			// 	onChange: value => setSetting(SETTING_IDS.SHAPE_COLOR1, value)
-			// },
-			// {
-			// 	type: SETTING_TYPES.COLOR,
-			// 	showIfDependee: SETTING_IDS.SHAPE_TYPE,
-			// 	showIf: value => {
-			// 		return value == SHAPE_TYPES.CIRCLE || value == SHAPE_TYPES.HALF_CIRCLE
-			// 	},
-			// 	id: SETTING_IDS.SHAPE_COLOR2,
-			// 	label: "Particle color 2",
-			// 	value: getCssVariable("buttonColor1"),
-			// 	recreateCss: true,
-			// 	onChange: value => setSetting(SETTING_IDS.SHAPE_COLOR2, value)
-			// },
-			// {
-			// 	type: SETTING_TYPES.COLOR,
-			// 	showIfDependent: SETTING_IDS.SHAPE_TYPE,
-			// 	showIf: value => {
-			// 		return true
-			// 	},
-			// 	id: SETTING_IDS.SHAPE_COLOR3,
-			// 	label: "Particle color",
-			// 	value: "rgba(0,0,0,0)",
-			// 	recreateCss: true,
-			// 	onChange: value => setSetting(SETTING_IDS.SHAPE_COLOR3, value)
-			// }
-		],
-		Particles: [
-			{
-				type: SETTING_TYPES.SLIDER,
-				id: SETTING_IDS.PARTICLE_AMOUNT,
-				label: "Particle amount",
-				value: 20,
-				min: 1,
-				max: 250,
-				step: 1,
-				recreateCss: true,
-				onChange: value => setSetting(SETTING_IDS.PARTICLE_AMOUNT, value)
 			},
-			{
-				type: SETTING_TYPES.COLOR,
-				id: SETTING_IDS.PARTICLE_COLOR,
-				label: "Particle color",
-				value: getCssVariable("buttonColor1"),
-				recreateCss: true,
-				onChange: value => setSetting(SETTING_IDS.PARTICLE_COLOR, value)
-			},
-			{
-				type: SETTING_TYPES.DOUBLE_SLIDER,
-				id: SETTING_IDS.SIZE_CHANGE,
-				label: "Size Change",
-				lowerValue: 0.95,
-				upperValue: 0.95,
-				min: 0.8,
-				max: 1.2,
-				step: 0.001,
-				recreateCss: true,
-				onChange: (lower, upper) =>
-					setSetting(SETTING_IDS.SIZE_CHANGE, [lower, upper])
-			},
-			{
-				type: SETTING_TYPES.DOUBLE_SLIDER,
-				id: SETTING_IDS.ROTATION_CHANGE,
-				label: "Direction change (deg)",
-				lowerValue: -5,
-				upperValue: 5,
-				min: -180,
-				max: 180,
-				step: 0.1,
-				recreateCss: true,
-				onChange: (lower, upper) =>
-					setSetting(SETTING_IDS.ROTATION_CHANGE, [lower, upper])
-			}
-		],
-		"Particle starting values": [
+
 			{
 				type: SETTING_TYPES.DOUBLE_SLIDER,
 				id: SETTING_IDS.START_SIZE,
@@ -278,13 +257,17 @@ const defaultSettings = {
 					setSetting(SETTING_IDS.START_SIZE, [lower, upper])
 			},
 			{
-				type: SETTING_TYPES.CHECKBOX,
-				id: SETTING_IDS.ANGLE_SPREAD_EVENLY,
-				label: "Spread start angle evenly",
-				value: true,
+				type: SETTING_TYPES.DOUBLE_SLIDER,
+				id: SETTING_IDS.SIZE_CHANGE,
+				label: "Size multiplier (each physics tick)",
+				lowerValue: 0.95,
+				upperValue: 0.95,
+				min: 0.8,
+				max: 1.2,
+				step: 0.001,
 				recreateCss: true,
-				onChange: event =>
-					setSetting(SETTING_IDS.ANGLE_SPREAD_EVENLY, event.target.checked)
+				onChange: (lower, upper) =>
+					setSetting(SETTING_IDS.SIZE_CHANGE, [lower, upper])
 			},
 			{
 				type: SETTING_TYPES.DOUBLE_SLIDER,
@@ -300,6 +283,15 @@ const defaultSettings = {
 					setSetting(SETTING_IDS.SPAWN_ANGLE, [lower, upper])
 			},
 			{
+				type: SETTING_TYPES.CHECKBOX,
+				id: SETTING_IDS.ANGLE_SPREAD_EVENLY,
+				label: "Spread start angle evenly",
+				value: true,
+				recreateCss: true,
+				onChange: event =>
+					setSetting(SETTING_IDS.ANGLE_SPREAD_EVENLY, event.target.checked)
+			},
+			{
 				type: SETTING_TYPES.DOUBLE_SLIDER,
 				id: SETTING_IDS.START_ANGLE,
 				label: "Starting direction",
@@ -312,6 +304,19 @@ const defaultSettings = {
 				onChange: (lower, upper) =>
 					setSetting(SETTING_IDS.START_ANGLE, [lower, upper])
 			},
+			{
+				type: SETTING_TYPES.DOUBLE_SLIDER,
+				id: SETTING_IDS.ROTATION_CHANGE,
+				label: "Direction change (deg)",
+				lowerValue: -5,
+				upperValue: 5,
+				min: -180,
+				max: 180,
+				step: 0.1,
+				recreateCss: true,
+				onChange: (lower, upper) =>
+					setSetting(SETTING_IDS.ROTATION_CHANGE, [lower, upper])
+			},
 
 			{
 				type: SETTING_TYPES.DOUBLE_SLIDER,
@@ -320,25 +325,11 @@ const defaultSettings = {
 				lowerValue: 45,
 				upperValue: 45,
 				min: 0,
-				max: 100,
+				max: 250,
 				step: 1,
 				recreateCss: true,
 				onChange: (lower, upper) =>
 					setSetting(SETTING_IDS.START_RADIUS, [lower, upper])
-			},
-
-			{
-				type: SETTING_TYPES.DOUBLE_SLIDER,
-				id: SETTING_IDS.START_SPEED,
-				label: "Initial Speed",
-				lowerValue: 2,
-				upperValue: 15,
-				min: 0,
-				max: 100,
-				step: 0.1,
-				recreateCss: true,
-				onChange: (lower, upper) =>
-					setSetting(SETTING_IDS.START_SPEED, [lower, upper])
 			}
 		],
 		Physics: [
@@ -377,15 +368,17 @@ const defaultSettings = {
 				onChange: value => setSetting(SETTING_IDS.GRAVITY_TOWARDS_BUTTON, value)
 			},
 			{
-				type: SETTING_TYPES.SLIDER,
-				id: SETTING_IDS.FRICTION,
-				label: "Friction",
-				value: 0.02,
+				type: SETTING_TYPES.DOUBLE_SLIDER,
+				id: SETTING_IDS.START_SPEED,
+				label: "Initial Speed",
+				lowerValue: 2,
+				upperValue: 15,
 				min: 0,
-				max: 1,
-				step: 0.01,
+				max: 100,
+				step: 0.1,
 				recreateCss: true,
-				onChange: value => setSetting(SETTING_IDS.FRICTION, value)
+				onChange: (lower, upper) =>
+					setSetting(SETTING_IDS.START_SPEED, [lower, upper])
 			},
 			{
 				type: SETTING_TYPES.SLIDER,
@@ -397,6 +390,17 @@ const defaultSettings = {
 				step: 0.01,
 				recreateCss: true,
 				onChange: value => setSetting(SETTING_IDS.THRUST, value)
+			},
+			{
+				type: SETTING_TYPES.SLIDER,
+				id: SETTING_IDS.FRICTION,
+				label: "Friction",
+				value: 0.02,
+				min: 0,
+				max: 1,
+				step: 0.01,
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.FRICTION, value)
 			},
 			{
 				type: SETTING_TYPES.SLIDER,
@@ -420,7 +424,7 @@ const defaultSettings = {
 				min: 50,
 				max: 300,
 				step: 1,
-				recreateCss: false,
+				recreateCss: true,
 				onChange: value => setSetting(SETTING_IDS.BUTTON_WIDTH, value)
 			},
 			{
@@ -431,7 +435,7 @@ const defaultSettings = {
 				min: 50,
 				max: 300,
 				step: 1,
-				recreateCss: false,
+				recreateCss: true,
 				onChange: value => setSetting(SETTING_IDS.BUTTON_HEIGHT, value)
 			},
 			{
@@ -479,6 +483,18 @@ const defaultSettings = {
 				onChange: value => setSetting(SETTING_IDS.BTN_FONT_COLOR, value)
 			},
 			{
+				type: SETTING_TYPES.CSS_NUMBER,
+				suffix: "px",
+				id: SETTING_IDS.BTN_FONT_SIZE,
+				label: "Button font size",
+				value: getCssVariable("buttonFontSize"),
+				min: 1,
+				max: 200,
+				step: 1,
+				recreateCss: false,
+				onChange: value => setSetting(SETTING_IDS.BTN_FONT_SIZE, value)
+			},
+			{
 				hidden: false,
 				type: SETTING_TYPES.SLIDER,
 				id: SETTING_IDS.BG_WIDTH,
@@ -508,8 +524,8 @@ const defaultSettings = {
 				hidden: true,
 				type: SETTING_TYPES.CHECKBOX,
 				id: SETTING_IDS.BG_IMG_COMPACT,
-				label: "Formatted",
-				value: true,
+				label: "Format",
+				value: false,
 				recreateCss: false,
 				onChange: event =>
 					setSetting(SETTING_IDS.BG_IMG_COMPACT, event.target.checked)
@@ -518,11 +534,31 @@ const defaultSettings = {
 				hidden: true,
 				type: SETTING_TYPES.CHECKBOX,
 				id: SETTING_IDS.KEYFRAME_COMPACT,
-				label: "Formatted",
-				value: true,
+				label: "Format",
+				value: false,
 				recreateCss: false,
 				onChange: event =>
 					setSetting(SETTING_IDS.KEYFRAME_COMPACT, event.target.checked)
+			},
+			{
+				hidden: true,
+				type: SETTING_TYPES.CHECKBOX,
+				id: SETTING_IDS.COMPLETE_COMPACT,
+				label: "Format",
+				value: true,
+				recreateCss: false,
+				onChange: event =>
+					setSetting(SETTING_IDS.COMPLETE_COMPACT, event.target.checked)
+			},
+			{
+				hidden: true,
+				type: SETTING_TYPES.TEXT_INPUT,
+				id: SETTING_IDS.BUTTON_NAME,
+				label: "Button name",
+				value: "Custom Button 001",
+				update: () => {},
+				recreateCss: true,
+				onChange: value => setSetting(SETTING_IDS.BUTTON_NAME, value)
 			}
 		]
 	}

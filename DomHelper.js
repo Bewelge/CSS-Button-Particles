@@ -64,16 +64,19 @@ export class DomHelper {
 		min,
 		max,
 		step,
-		onChange
+		onChange,
+		formatVal
 	) {
+		formatVal = formatVal || (val => val)
+
 		let displayDiv = DomHelper.createElement(
 			"div",
 			{},
-			{ id: id + "Field", className: "sliderVal", innerHTML: val }
+			{ id: id + "Field", className: "sliderVal", innerHTML: formatVal(val) }
 		)
 
 		let onChangeInternal = ev => {
-			displayDiv.innerHTML = ev.target.value
+			displayDiv.innerHTML = formatVal(ev.target.value)
 			onChange(ev.target.value)
 		}
 
@@ -274,7 +277,7 @@ export class DomHelper {
 			onChange(input.value)
 		}
 		input.value = value
-		// input.setAttribute("rows", rows)
+		input.setAttribute("rows", rows)
 
 		let labelEl = DomHelper.createElementWithClass(
 			"settingLabel",
@@ -423,6 +426,32 @@ export class DomHelper {
 		)
 		bt.appendChild(DomHelper.getButtonSelectLine())
 		return bt
+	}
+	static createTextButtonWithSuccessMsgField(id, text, onClick, onSuccessMsg) {
+		let cont = DomHelper.createDivWithClass("txtBtnCont")
+		let txtField = DomHelper.createDivWithClass("txtBtnField hidden")
+		let onClickExt = ev => {
+			if (onClick(ev)) {
+				txtField.classList.remove("hidden")
+				txtField.innerHTML = onSuccessMsg(ev)
+				window.setTimeout(() => txtField.classList.add("hidden"), 1000)
+			}
+		}
+		let bt = DomHelper.createElement(
+			"button",
+			{},
+			{
+				id: id,
+				type: "button",
+				className: "btn btn-default",
+				onclick: onClickExt,
+				innerHTML: text
+			}
+		)
+		bt.appendChild(DomHelper.getButtonSelectLine())
+
+		DomHelper.appendChildren(cont, [bt, txtField])
+		return cont
 	}
 	static getButtonSelectLine() {
 		return DomHelper.createDivWithClass("btn-select-line")
@@ -583,7 +612,7 @@ export class DomHelper {
 			onChange(color.toRGBA().toString())
 		})
 
-		return cont
+		return { cont, colorPicker }
 	}
 	static hideDiv(div) {
 		// if (div) {
@@ -597,31 +626,28 @@ export class DomHelper {
 		div.classList.add("unhidden")
 		// }
 	}
+	static undisplayDiv(div) {
+		div.classList.add("gone")
+	}
+	static displayDiv(div) {
+		div.classList.remove("gone")
+	}
 	static createHiddenScrollBar() {}
 
 	static initDoubleSliders() {
 		//TODO Fix&Cleanup
+
 		document.querySelectorAll(".minSlider").forEach(el => {
 			let maxSlider = el.parentElement.querySelector(".maxSlider")
 
 			let maxGrabbed = false
-			window.addEventListener("mouseup touchend", () => (maxGrabbed = false))
-			el.addEventListener("mousedown touchstart", ev => {
-				// let maxSliderPos =
-				// 	((parseFloat(maxSlider.value) - parseFloat(maxSlider.min)) /
-				// 		(parseFloat(maxSlider.max) - parseFloat(maxSlider.min))) *
-				// 	el.clientWidth
-				// let minSliderPos =
-				// 	((parseFloat(minSlider.value) - parseFloat(minSlider.min)) /
-				// 		(parseFloat(minSlider.max) - parseFloat(minSlider.min))) *
-				// 	el.clientWidth
-
+			window.addEventListener("mouseup", () => (maxGrabbed = false))
+			el.addEventListener("mousedown", ev => {
 				const mouseX = ev.clientX - el.getBoundingClientRect().left
 				let valAtMouse =
 					parseFloat(maxSlider.min) +
 					(parseFloat(maxSlider.max) - parseFloat(maxSlider.min)) *
 						(mouseX / el.clientWidth)
-
 				if (valAtMouse - el.value > maxSlider.value - valAtMouse) {
 					ev.preventDefault()
 					let valAtMouse =

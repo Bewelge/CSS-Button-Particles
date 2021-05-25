@@ -11,6 +11,7 @@ class Settings {
 		this.settings = getDefaultSettings()
 		let savedSettings = getGlobalSavedSettings()
 		this.resetCallbacks = []
+		this.loadCallbacks = []
 
 		let urlParams = getURLParams()
 		let entries = urlParams.entries()
@@ -73,9 +74,7 @@ class Settings {
 				.map(setting => setting.showIfDependee)
 		)
 	}
-	setSettingValue(settingId, value) {
-		this.settingsById[settingId].value = value
-	}
+	resetToDefault() {}
 }
 
 const globalSettings = new Settings()
@@ -88,7 +87,8 @@ export const initSettingDependencies = () => {
 export const getAllCssSettings = () => {
 	return Object.keys(globalSettings.settingsById).filter(
 		settingId =>
-			globalSettings.settingsById[settingId].type == SETTING_TYPES.CSS_COLOR
+			globalSettings.settingsById[settingId].type == SETTING_TYPES.CSS_COLOR ||
+			globalSettings.settingsById[settingId].type == SETTING_TYPES.CSS_NUMBER
 	)
 }
 export const getSetting = settingId => {
@@ -197,24 +197,40 @@ export const resetSettingsToDefault = () => {
 				} else {
 					globalSettings.settingsById[setting.id].value = setting.value
 				}
+				globalSettings.settingsUi.updateSettingDivValue(setting.id)
+				checkDependencies(setting.id)
 			})
 		)
 	)
 
-	let parent = globalSettings.settingsUi.getSettingsDiv(
-		globalSettings.settings
-	).parentElement
-	parent.removeChild(
-		globalSettings.settingsUi.getSettingsDiv(globalSettings.settings)
-	)
-	globalSettings.settingsUi.mainDiv = null
-	parent.appendChild(getSettingsDiv())
 	globalSettings.resetCallbacks.forEach(callback => callback())
 	saveCurrentSettings()
+}
+export const loadAButton = settingsObj => {
+	resetSettingsToDefault()
+	Object.keys(settingsObj).forEach(settingId => {
+		let val = settingsObj[settingId]
+		if (globalSettings.settingsById.hasOwnProperty(settingId)) {
+			if (isSettingMinMaxSlider(settingId)) {
+				globalSettings.settingsById[settingId].upperValue = val.max
+				globalSettings.settingsById[settingId].lowerValue = val.min
+			} else {
+				globalSettings.settingsById[settingId].value = val
+			}
+		} else {
+			console.error("Unknown setting ID: " + settingId)
+		}
+		globalSettings.settingsUi.updateSettingDivValue(settingId)
+		checkDependencies(settingId)
+	})
+	globalSettings.loadCallbacks.forEach(callback => callback())
 }
 
 export const addResetCallback = callback => {
 	globalSettings.resetCallbacks.push(callback)
+}
+export const addLoadCallback = callback => {
+	globalSettings.loadCallbacks.push(callback)
 }
 
 function isSettingMinMaxSlider(settingId) {

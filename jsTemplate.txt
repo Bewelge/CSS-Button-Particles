@@ -1,0 +1,11 @@
+
+window.onload = () => {
+    document.querySelectorAll("button.particleButton").forEach(btn => {
+        let btnBg = btn.parentNode.querySelector(".particles")
+        let initalListener = () => {
+            btnBg.classList.add("animated")
+            btn.removeEventListener("click", initalListener)
+        }
+        btn.addEventListener("click", initalListener)
+    })
+}

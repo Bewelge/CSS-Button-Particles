@@ -145,9 +145,19 @@ export class SettingUI {
 	showHideSettings(settingsShowHideList) {
 		settingsShowHideList.forEach(idShowHidePair => {
 			idShowHidePair[1]
-				? DomHelper.showDiv(this.settingDivs[idShowHidePair[0]])
-				: DomHelper.hideDiv(this.settingDivs[idShowHidePair[0]])
+				? DomHelper.displayDiv(this.settingDivs[idShowHidePair[0]])
+				: DomHelper.undisplayDiv(this.settingDivs[idShowHidePair[0]])
 		})
+	}
+	getSettingDivById(settingId) {
+		return this.settingDivs[settingId]
+	}
+	updateSettingDivValue(settingId) {
+		if (
+			this.settingDivs[settingId] &&
+			this.settingDivs[settingId].updateSettingValue
+		)
+			this.settingDivs[settingId].updateSettingValue()
 	}
 	static createSettingDiv(setting) {
 		switch (setting.type) {
@@ -161,6 +171,8 @@ export class SettingUI {
 				return SettingUI.createColorSettingDiv(setting)
 			case SETTING_TYPES.CSS_COLOR:
 				return SettingUI.createCssColorSettingDiv(setting)
+			case SETTING_TYPES.CSS_NUMBER:
+				return SettingUI.createCssNumberSettingDiv(setting)
 			case SETTING_TYPES.DOUBLE_SLIDER:
 				return SettingUI.createMinMaxSliderSettingDiv(setting)
 			case SETTING_TYPES.TEXT_INPUT:
@@ -177,6 +189,13 @@ export class SettingUI {
 			setting.onChange
 		)
 		el.classList.add("settingContainer")
+		el.updateSettingValue = () => {
+			el.querySelectorAll("option").forEach(option => {
+				if (option.value == setting.value) {
+					option.selected = true
+				}
+			})
+		}
 		return el
 	}
 	static createCheckboxSettingDiv(setting) {
@@ -187,6 +206,10 @@ export class SettingUI {
 			setting.isChecked
 		)
 		el.classList.add("settingContainer")
+		el.updateSettingValue = () =>
+			(el.querySelector("input").checked = setting.isChecked
+				? setting.isChecked()
+				: setting.value)
 		return el
 	}
 	static createSliderSettingDiv(setting) {
@@ -200,6 +223,10 @@ export class SettingUI {
 			setting.onChange
 		).container
 		el.classList.add("settingContainer")
+		el.updateSettingValue = () => {
+			el.querySelector("input").value = setting.value
+			el.querySelector(".sliderVal").innerHTML = setting.value
+		}
 		return el
 	}
 	static createMinMaxSliderSettingDiv(setting) {
@@ -213,6 +240,14 @@ export class SettingUI {
 			setting.step,
 			setting.onChange
 		).container
+		el.updateSettingValue = () => {
+			el.querySelector(".minSlider").value = setting.lowerValue
+			el.querySelector(".maxSlider").value = setting.upperValue
+			el.querySelector(".sliderVal").innerHTML =
+				setting.lowerValue == setting.upperValue
+					? setting.lowerValue
+					: setting.lowerValue + " < - > " + setting.upperValue
+		}
 		el.classList.add("settingContainer")
 		return el
 	}
@@ -224,6 +259,9 @@ export class SettingUI {
 			setting.onChange
 		)
 		el.classList.add("settingContainer")
+		el.updateSettingValue = () => {
+			el.querySelector("input").value = setting.value
+		}
 		return el
 	}
 	static createTextAreaSettingDiv(setting) {
@@ -232,27 +270,63 @@ export class SettingUI {
 			setting.label,
 			setting.value,
 			setting.onChange,
-			20
+			5
 		)
 		el.classList.add("settingContainer")
+		el.updateSettingValue = () => {
+			el.querySelector("textarea").value = setting.value
+		}
 		return el
 	}
 	static createColorSettingDiv(setting) {
-		return DomHelper.createColorPickerText(
+		let el = DomHelper.createColorPickerText(
 			setting.label,
 			setting.value,
 			setting.onChange
 		)
+		el.cont.updateSettingValue = () => {
+			el.colorPicker.setColor(setting.value)
+		}
+		return el.cont
 	}
 	static createCssColorSettingDiv(setting) {
 		let onChange = value => {
 			setCssVariable(setting.id, value)
 			setting.onChange(value)
 		}
-		return DomHelper.createColorPickerText(
+		let el = DomHelper.createColorPickerText(
 			setting.label,
 			setting.value,
 			onChange
 		)
+		el.cont.updateSettingValue = () => {
+			el.colorPicker.setColor(setting.value.trim())
+			setCssVariable(setting.id, setting.value)
+		}
+		return el.cont
+	}
+	static createCssNumberSettingDiv(setting) {
+		let onChange = value => {
+			setCssVariable(setting.id, value + setting.suffix)
+			setting.onChange(value)
+		}
+		let formatVal = val => val + "px"
+		let el = DomHelper.createSliderWithLabelAndField(
+			setting.id + "Slider",
+			setting.label,
+			parseFloat(setting.value),
+			setting.min,
+			setting.max,
+			setting.step,
+			onChange,
+			formatVal
+		).container
+		el.classList.add("settingContainer")
+		el.updateSettingValue = () => {
+			el.querySelector("input").value = setting.value
+			el.querySelector(".sliderVal").innerHTML = setting.value
+			setCssVariable(setting.id, setting.value + setting.suffix)
+		}
+		return el
 	}
 }

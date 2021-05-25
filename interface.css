@@ -12,11 +12,12 @@
 	--bg3: white;
 	--bg4: #e67e22;
 	--bg5: #f5f6f7;
+	--bg6: rgba(0, 0, 0, 0.6);
 }
 
 html,
 body {
-	font-size: 16px;
+	font-size: 21px;
 	font-family: "Roboto", sans-serif;
 	text-align: center;
 	width: 100%;
@@ -24,8 +25,10 @@ body {
 	margin: 0px;
 	padding: 0px;
 	color: var(--fontColor);
-	overflow-x: hidden;
+	overflow: hidden;
+	background-color: var(--bg5);
 }
+
 .headerWrap {
 	font-family: "Roboto", sans-serif;
 	width: 100%;
@@ -43,9 +46,11 @@ body {
 	z-index: 12;
 }
 
-.mainWrap {
+.mainWrapper {
 	width: 100%;
-	height: 100%;
+	height: calc(100% - 500px);
+	margin-top: 500px;
+	overflow-y: scroll;
 }
 .buttonPreviewWrap {
 	width: 100%;
@@ -55,10 +60,10 @@ body {
 	position: fixed;
 	top: 0;
 	left: 0;
-	/* height: 500px; */
 	background-color: var(--bg1);
 	pointer-events: none;
 	max-height: 50%;
+	box-shadow: 0em 0.2em 10px 3px rgb(0 0 0 / 50%);
 }
 .sideFiller {
 	display: flex;
@@ -66,9 +71,6 @@ body {
 	justify-content: space-evenly;
 }
 .sideFiller button {
-	padding: 16px 8px 20px;
-	font-size: 16px;
-	font-weight: 500;
 	cursor: pointer;
 	pointer-events: all;
 }
@@ -81,7 +83,7 @@ body {
 }
 .settingsWrap {
 	z-index: 10;
-	margin-top: 500px;
+	/* margin-top: 500px; */
 }
 /* .progrBar {
 	width: 600px;
@@ -97,7 +99,6 @@ body {
 }
 .codeOutputWrap {
 	width: 100%;
-	padding: 2em;
 	box-sizing: border-box;
 	display: flex;
 	justify-content: center;
@@ -107,21 +108,24 @@ body {
 	flex-wrap: nowrap;
 }
 
+.codeBoxCont:first-child {
+	/* margin-top: 0px; */
+}
 .codeBoxCont {
 	max-width: 80%;
 	width: 600px;
 	/* padding: 20%; */
 	position: relative;
 	margin-top: 2em;
+	margin-bottom: 2em;
 	overflow: hidden;
 }
 .codeBox {
 	padding: 15px;
 	font-family: Courier, sans-serif;
-	font-size: 1em;
+	font-size: 0.7em;
 	line-height: 1.3;
 	color: var(--bg3);
-	background-color: var(--bg1);
 	-webkit-border-radius: 0px 0px 6px 6px;
 	-moz-border-radius: 0px 0px 6px 6px;
 	border-radius: 0px 0px 6px 6px;
@@ -130,6 +134,7 @@ body {
 	max-height: 300px;
 	margin: 0px;
 	padding-bottom: 55px;
+	background-color: var(--bg1);
 }
 
 code {
@@ -142,9 +147,9 @@ code {
 
 .codeHeader {
 	box-sizing: border-box;
-	padding: 10px 15px 10px 15px;
+	/* padding: 10px 15px 10px 15px; */
 	font-family: "Roboto", sans-serif;
-	font-size: 1.1em;
+	font-size: 1rem;
 	color: var(--bg3);
 	-webkit-border-radius: 6px 6px 0px 0px;
 	-moz-border-radius: 6px 6px 0px 0px;
@@ -160,7 +165,9 @@ code {
 	align-items: center;
 	align-content: center;
 }
-
+.codeHeader .checkboxContainer {
+	padding-right: 15px;
+}
 .codeHeader .checkboxContainer input {
 	margin-left: 5px;
 	background-color: var(--buttonColor1);
@@ -169,17 +176,34 @@ code {
 }
 .codeHeader .checkboxContainer .checkboxInput:checked {
 	box-shadow: inset 0em 0em 0em 0.3em var(--bg1),
-		inset 0em 0em 0em 0.75em var(--buttonColor2) !important;
+		inset 0em 0em 0em 0.75em var(--bg4) !important;
 }
 .codeHeader .checkboxContainer .checkboxLabel {
-	font-size: 1.1em;
+	font-size: 0.8rem;
 	font-family: "Roboto", sans-serif;
 	text-align: left;
 	line-height: 21px;
 	color: var(--bg3);
 }
+
+.codeBoxTitle {
+	padding: 10px 15px 10px 15px;
+}
+.codeBoxTitleTab {
+	padding: 10px 15px 10px 15px;
+	flex-grow: 2;
+	border-right: 2px solid var(--borderColor);
+	box-shadow: inset 0 0 0px 0px rgba(0, 0, 0, 0.2);
+	transition: all 0.6s ease-out;
+}
+.codeBoxTitleTab:last-child {
+	border-right: none;
+}
+.codeBoxTitleTab:hover {
+	box-shadow: inset 0 0 30px 30px rgba(0, 0, 0, 0.2);
+}
 .codeBoxCont button {
-	font-size: 1.1em;
+	font-size: 1rem;
 	width: 100%;
 	height: 50px;
 	cursor: pointer;
@@ -194,14 +218,139 @@ code {
 .codeHeader button:active {
 	transform: scale(0.95, 0.95);
 }
-#codeheader_html {
-	background-color: #3d9970;
+
+.btn {
+	box-shadow: inset 0 0 0px 0px rgba(0, 0, 0, 0.2);
+	transition: all 0.3s ease-out;
+	border: none;
+	padding: 10px 15px 10px 15px;
+	background-color: var(--bg2);
+	min-height: 50px;
+	border-radius: 3px;
+	font-weight: 600;
+	font-size: 1rem;
+	-webkit-font-smoothing: subpixel-antialiased;
+	backface-visibility: hidden;
+	transform: perspective(1px) translateZ(0) scale(1, 1);
 }
-#codeheader_css {
-	background-color: #0074d9;
+.btn:hover {
+	transform: perspective(1px) translateZ(0) scale(1.05, 1.05);
+	/* box-shadow: inset 0px 50px 0px 0px rgba(0, 0, 0, 0.2); */
 }
-#codeheader_php {
-	background-color: #85144b;
+.btn:active {
+	transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+	transform: perspective(1px) translateZ(0) scale(0.86, 0.86);
 }
-#codeheader_js {
+/* .btn::after {
+	background-image: radial-gradient(black, black 50%, transparent 50%);
+	animation: genericBtnAnim linear 1s forwards;
+	position: absolute;
+	content: "";
+	left: -105px;
+	top: -105px;
+	min-width: 300px;
+	min-height: 300px;
+	pointer-events: none;
+	transition: background-size ease-in-out 0.5s,
+		background-position ease-in-out 0.5s;
+	background-repeat: no-repeat;
+	overflow: hidden;
+}
+.btn:active::after {
+	animation: none;
+	background-size: 0;
+}
+@keyframes genericBtnAnim {
+	0% {
+		background-size: 0% 0%;
+		background-position: 50% 50%;
+	}
+	100% {
+		background-size: 100% 100%;
+		background-position: 50% 50%;
+	}
+} */
+
+.modalWindowBg {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: var(--bg6);
+	/* opacity: 0.5; */
+	display: flex;
+	align-content: flex-start;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+	transition: all 0.3s ease-out;
+}
+.modalWindow {
+	opacity: 1;
+	width: 50%;
+
+	background-color: var(--bg5);
+	color: var(--fontColor);
+	border-radius: 6px 6px 0px 0px;
+	padding-bottom: 20px;
+	max-height: 50%;
+
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+.modalWindowTitle {
+	opacity: 1;
+	box-sizing: border-box;
+	background-color: var(--bg2);
+	width: 100%;
+	font-size: 1.1em;
+	padding: 10px 5px;
+	margin-bottom: 1em;
+}
+
+.modalInnerWrap {
+	width: 80%;
+	margin-left: 10%;
+}
+.btnRow {
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	align-content: center;
+	transition: all 0.3s ease-out;
+	border-bottom: 1px solid var(--bg6);
+}
+.btnRow:hover {
+	transform: scale(1.1, 1.1);
+	background-color: var(--borderColor);
+}
+.btnRow:hover div:last-child {
+	margin-right: 4.5%;
+	background-color: var(--borderColor);
+}
+.btnRow div {
+	padding-top: 10px;
+	padding-bottom: 10px;
+	flex: 3;
+}
+.btnRow div:last-child {
+	padding: 10px;
+	flex: 1;
+	flex-grow: 0;
+	transition: all 0.2s ease-out;
+}
+.btnRow div:last-child:hover {
+	transition: all 0.2s ease-out;
+	cursor: pointer;
+	background-color: var(--bg5);
+	/* transform: scale(1.5, 1.5); */
+}
+
+.dividerLine {
+	width: 100%;
+	height: 1px;
+	background-color: var(--borderColor);
+	margin-top: 50px;
+	margin-bottom: 50px;
 }

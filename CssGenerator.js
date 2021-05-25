@@ -1,5 +1,5 @@
 import { getCssStringForShape } from "./CssShapes.js"
-import { SETTING_IDS } from "./DefaultSettings.js"
+import { SETTING_IDS, SETTING_TYPES } from "./DefaultSettings.js"
 import { getAllCssSettings, getSetting, getSettingObject } from "./Settings.js"
 import { getCssVariable, replaceAllString } from "./Util.js"
 
@@ -11,6 +11,7 @@ class CssGenerator {
 	constructor(keyframes, shapes) {
 		this.keyframes = keyframes
 		this.shapes = shapes
+		this.generateListeners = []
 	}
 	setData(keyframes, shapes) {
 		this.keyframes = keyframes
@@ -28,13 +29,13 @@ class CssGenerator {
 		let btnEffectWd = getSetting(SETTING_IDS.BG_WIDTH)
 		let btnEffectHt = getSetting(SETTING_IDS.BG_HEIGHT)
 		return getCssStringFromObj({
-			".buttonEffect::after": {
+			".particles::after": {
 				left: -1 * (btnEffectWd / 2 - btnWd / 2) + "px",
 				top: -1 * (btnEffectHt / 2 - btnHt / 2) + "px",
 				"min-width": btnEffectWd + "px",
 				"min-height": btnEffectHt + "px"
 			},
-			".button": {
+			".particleButton": {
 				width: btnWd + "px",
 				height: btnHt + "px",
 				// background: getSetting(SETTING_IDS.BG_COLOR),
@@ -113,11 +114,15 @@ class CssGenerator {
 		let tab = formated ? "    " : ""
 
 		let transformRotate = 0
-		let transformRotatePerKeyframe = getSetting(SETTING_IDS.TRANSFORM_ROTATE)
-		let transformScaleX = 100
-		let transformScaleY = 100
-		let transformScaleXPerKeyframe = getSetting(SETTING_IDS.TRANSFORM_SCALE_X)
-		let transformScaleYPerKeyframe = getSetting(SETTING_IDS.TRANSFORM_SCALE_Y)
+		let transformRotateZ = 0
+		let transfRotateX = getSetting(SETTING_IDS.TRANSFORM_ROTATE_X)
+		let transfRotateY = getSetting(SETTING_IDS.TRANSFORM_ROTATE_Y)
+		let transfRotateZ = getSetting(SETTING_IDS.TRANSFORM_ROTATE_Z)
+		let transfScaleConst = getSetting(SETTING_IDS.TRANSFORM_SCALE_CONSTANT)
+		let transformScaleX = transfScaleConst
+		let transformScaleY = transfScaleConst
+		let transfScaleX = getSetting(SETTING_IDS.TRANSFORM_SCALE_X)
+		let transfScaleY = getSetting(SETTING_IDS.TRANSFORM_SCALE_Y)
 
 		let keyframesString = "@keyframes " + ANIMATION_NAME + " {"
 		this.keyframes.forEach((keyframe, index) => {
@@ -127,24 +132,81 @@ class CssGenerator {
 			keyframesString +=
 				tab +
 				tab +
-				"transform: rotate(" +
-				transformRotate +
-				"deg) scale(" +
-				transformScaleX / 100 +
-				"," +
-				transformScaleY / 100 +
-				");" +
+				this.getTransformString(
+					index,
+					transfRotateX,
+					transfRotateY,
+					transfRotateZ,
+					transfScaleConst,
+					transfScaleX,
+					transfScaleY
+				) +
 				newline
 			keyframesString += tab + tab + this.getBgSizeString(index) + newline
 			keyframesString += tab + tab + this.getBgPositionString(index) + newline
 			keyframesString += tab + "}"
-			transformRotate += transformRotatePerKeyframe
-			transformScaleX += transformScaleXPerKeyframe
-			transformScaleY += transformScaleYPerKeyframe
+			// transformRotate += transformRotatePerKeyframe
+			// transformScaleX += transformScaleXPerKeyframe
+			// transformScaleY += transformScaleYPerKeyframe
 		})
 		keyframesString += "}"
 		// console.log(keyframesString)
 		return keyframesString
+	}
+	getTransformString(
+		index,
+		rotateX,
+		rotateY,
+		rotateZ,
+		scaleConst,
+		scaleX,
+		scaleY
+	) {
+		let rotateXPart = rotateX != 0 ? "rotateX(" + index * rotateX + "deg) " : ""
+		let rotateYPart = rotateY != 0 ? "rotateY(" + index * rotateY + "deg) " : ""
+		let rotateZPart = rotateZ != 0 ? "rotateZ(" + index * rotateZ + "deg) " : ""
+		// let isAnyRotateSet = rotateX != 0 || rotateY != 0 || rotateZ != 0
+		// let rotatePart = isAnyRotateSet
+		// 	? "rotate3d(" +
+		// 	  index * rotateX +
+		// 	  "deg," +
+		// 	  index * rotateY +
+		// 	  "deg," +
+		// 	  index * rotateZ +
+		// 	  "deg)"
+		// 	: ""
+
+		let isAnyScaleSet = scaleX != 0 || scaleY != 0 || scaleConst != 100
+		let scalePart = ""
+		if (isAnyScaleSet) {
+			scalePart =
+				"scale(" +
+				(scaleConst / 100 + (scaleX * index) / 100) +
+				"," +
+				(scaleConst / 100 + (scaleY * index) / 100) +
+				")"
+		}
+
+		if (
+			rotateXPart.length +
+				rotateYPart.length +
+				rotateZPart.length +
+				scalePart.length >
+			0
+		) {
+			return (
+				"transform: " +
+				rotateXPart +
+				" " +
+				rotateYPart +
+				" " +
+				rotateZPart +
+				" " +
+				scalePart +
+				";"
+			)
+		}
+		return ""
 	}
 	getBgSizeString(keyframeIndex) {
 		let sizeString = "background-size: "
@@ -177,6 +239,9 @@ class CssGenerator {
 		posString += ";"
 		return posString
 	}
+	addGenerateListener(listener) {
+		this.generateListeners.push(listener)
+	}
 }
 
 function wrapInStyleTag(styleString) {
@@ -201,25 +266,53 @@ export const generateAndAppendCss = retry => {
 		lastGenerated = window.performance.now()
 		theCssGen.generateCss()
 		theCssGen.appendStyleTagToBody()
-		document.getElementById("keyframesCss").querySelector("pre").innerHTML =
-			theCssGen.getKeyframeString(getSetting(SETTING_IDS.KEYFRAME_COMPACT))
-		document.getElementById("bgImgCss").querySelector("pre").innerHTML =
-			theCssGen.getBgImageString(getSetting(SETTING_IDS.BG_IMG_COMPACT))
+		theCssGen.generateListeners.forEach(listener => listener())
 	}
 }
 
-export const getHtmlTemplateString = async () => {
+export const getHtmlExportString = async () => {
 	let textContent = ""
-	let templateString = await fetch("template.txt")
+	await fetch("htmlTemplate.txt")
+		.then(res => res.text())
+		.then(res => (textContent = res))
+	return textContent
+}
+export const escapeHtml = unsafe => {
+	return unsafe
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;")
+}
+export const getCssExportString = async () => {
+	let textContent = ""
+	await fetch("cssTemplate.txt")
+		.then(res => res.text())
+		.then(res => (textContent = res))
+
+	textContent = fillRootVarsInString(textContent)
+	textContent +=
+		theCssGen.bgImageString +
+		" \n" +
+		theCssGen.keyframesString +
+		" \n" +
+		theCssGen.buttonStyleString
+	return textContent
+}
+export const getJsExportString = async () => {
+	let textContent = ""
+	await fetch("jsTemplate.txt").then(res => (textContent = res.text()))
+	return textContent
+}
+
+export const getSingleHtmlTemplateString = async () => {
+	let textContent = ""
+	let templateString = await fetch("singleFileTemplate.txt")
 		.then(response => response.text())
 		.then(text => (textContent = text))
 
-	let rootVarsString = ":root { \n"
-	getAllCssSettings().forEach(setting => {
-		rootVarsString += "--" + setting + ": " + getCssVariable(setting) + "; \n"
-	})
-	rootVarsString += "}"
-	textContent = replaceAllString(textContent, "#ROOTVARS#", rootVarsString)
+	textContent = fillRootVarsInString(textContent)
 
 	return textContent.replace(
 		"#STYLE_PLACEHOLDER#",
@@ -229,6 +322,17 @@ export const getHtmlTemplateString = async () => {
 			" \n" +
 			theCssGen.buttonStyleString
 	)
+}
+
+function fillRootVarsInString(textContent) {
+	let rootVarsString = ":root { \n"
+	getAllCssSettings().forEach(setting => {
+		let suffix = setting.type == SETTING_TYPES.CSS_NUMBER ? setting.suffix : ""
+		rootVarsString +=
+			"--" + setting + ": " + getCssVariable(setting) + suffix + "; \n"
+	})
+	rootVarsString += "}"
+	return replaceAllString(textContent, "#ROOTVARS#", rootVarsString)
 }
 
 /**

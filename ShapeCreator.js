@@ -93,10 +93,10 @@ export class ShapeCreator {
 					motX *= friction
 					motY *= friction
 
-					motX += Math.cos(direction) * thrust * 10
-					motY += Math.sin(direction) * thrust * 10
+					motX += Math.cos(direction) * thrust
+					motY += Math.sin(direction) * thrust
 
-					motY -= (gravity * Math.sqrt(sizeX * sizeY)) / 100
+					motY -= gravity / 250
 
 					let angToMiddle = angle(x, y, bgWidth / 2, bgHeight / 2)
 					let disToMiddle = dist(x, y, bgWidth / 2, bgHeight / 2)
