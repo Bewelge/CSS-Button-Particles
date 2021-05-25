@@ -1,5 +1,4 @@
-import { replaceAllString } from "../Util.js"
-import { roundToDecimals } from "./Util.js"
+import { replaceAllString } from "./Util.js"
 
 export class DomHelper {
 	static createCanvas(width, height, styles) {
@@ -424,6 +423,7 @@ export class DomHelper {
 				innerHTML: text
 			}
 		)
+		//
 		bt.appendChild(DomHelper.getButtonSelectLine())
 		return bt
 	}
