@@ -22,7 +22,6 @@ function arrayContains(arr, item) {
 	return false
 }
 /**
- *
  * @param {CanvasRenderingContext2D} ctx
  * @param {Number} x
  * @param {Number} y
