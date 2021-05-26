@@ -1,4 +1,4 @@
-import { DomHelper } from "./DomHelper.js"
+import { DomHelper } from "../Util/DomHelper.js"
 import {
 	createParameterStringWithSettings,
 	getASettingDiv,
@@ -7,22 +7,21 @@ import {
 	setSettingCallback,
 	loadAButton,
 	setSetting
-} from "./Settings.js"
+} from "../Settings/Settings.js"
 import {
 	getCssGenerator,
 	getHtmlExportString,
 	getJsExportString,
 	getCssExportString,
-	getSingleHtmlTemplateString,
-	escapeHtml
-} from "./CssGenerator.js"
-import { SETTING_IDS } from "./DefaultSettings.js"
-import { getScrollbarWidth, setCssVariable } from "./Util.js"
+	getSingleHtmlTemplateString
+} from "../CssGenerator.js"
+import { SETTING_IDS } from "../Settings/DefaultSettings.js"
+import { getScrollbarWidth, setCssVariable, escapeHtml } from "../Util/Util.js"
 import {
 	deleteSavedButton,
 	getSavedButtons,
 	saveCurrentButtonInLocalStorage
-} from "./LocalStorageHandler.js"
+} from "../Settings/LocalStorageHandler.js"
 
 export class UI {
 	constructor() {
@@ -34,6 +33,24 @@ export class UI {
 
 		setCssVariable("scrollBarWidth", getScrollbarWidth() + "px")
 		setCssVariable("scrollBarHeight", getScrollbarWidth() + "px")
+
+		let resizeFunc = () => {
+			this.mainDiv.style.height =
+				"calc(100% - " +
+				(this.getButtonPreviewDiv().clientHeight +
+					this.getHeader().clientHeight) +
+				"px)"
+			this.mainDiv.style.marginTop =
+				this.getButtonPreviewDiv().clientHeight +
+				this.getHeader().clientHeight +
+				"px"
+			this.getButtonPreviewDiv().style.marginTop =
+				this.getHeader().clientHeight + "px"
+			this.getButtonPreviewDiv().style.maxHeight =
+				"calc(50% - " + this.getHeader().clientHeight + "px)"
+		}
+		resizeFunc()
+		window.addEventListener("resize", resizeFunc)
 	}
 	getMainDiv() {
 		if (this.mainDiv == null) {
@@ -63,6 +80,13 @@ export class UI {
 		if (this.headerDiv == null) {
 			this.headerDiv = DomHelper.createElementWithClass("headerWrap", "nav")
 			this.headerDiv.innerHTML = "CSS Particle Button Generator"
+
+			let githubLink = document.createElement("a")
+			githubLink.href = "https://github.com/Bewelge/cssParticles"
+			let githubLogo = document.createElement("img")
+			githubLogo.src = "./github.svg"
+			githubLink.appendChild(githubLogo)
+			this.headerDiv.appendChild(githubLink)
 		}
 		return this.headerDiv
 	}
@@ -350,14 +374,14 @@ export class UI {
 	}
 	addBlablaContent1() {
 		let bla = DomHelper.createElementWithId("blabla")
-		fetch("blablaText1.html")
+		fetch("../../templates/blablaText1.html")
 			.then(res => res.text())
 			.then(res => (bla.innerHTML = res))
 		this.mainDiv.appendChild(bla)
 	}
 	addBlablaContent2() {
 		let bla = DomHelper.createElementWithId("blabla")
-		fetch("blablaText2.html")
+		fetch("../../templates/blablaText2.html")
 			.then(res => res.text())
 			.then(res => (bla.innerHTML = res))
 		this.mainDiv.appendChild(bla)

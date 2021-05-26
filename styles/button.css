@@ -1,7 +1,7 @@
 :root {
-	--buttonColor0: #0c5b8371;
-	--buttonColor1: #0c5b8371;
-	--buttonColor2: white;
+	--buttonColor0: #f44336;
+	--buttonColor1: rgba(255, 255, 255, 0);
+	--buttonColor2: rgba(255, 255, 255, 0);
 	--buttonColor3: #90a4ae8f;
 	--buttonFontColor: white;
 	--buttonFontSize: 16px;
@@ -31,8 +31,11 @@
 		0px 0px 0px 9px var(--buttonColor1),
 		inset 0px 0px 0px 0px var(--buttonColor2);
 
-	transform: translate(-50%, -50%) scale(1, 1);
-	transition: box-shadow ease-out 0.3s, transform 0.1s ease-in;
+	transform: perspective(1px) translateZ(0) translate(-50%, -50%) scale(1, 1);
+	transition: box-shadow ease-out 0.3s, transform 0.3s ease-in;
+
+	-webkit-font-smoothing: subpixel-antialiased;
+	backface-visibility: hidden;
 }
 
 .particleButton:hover:not(:active) {
@@ -41,7 +44,8 @@
 		0px 0px 0px 14px var(--buttonColor1),
 		inset 0px 0px 0px 0px var(--buttonColor2);
 
-	transform: translate(-50%, -50%) scale(0.95, 0.95);
+	transform: perspective(1px) translateZ(0) translate(-50%, -50%)
+		scale(1.05, 1.05);
 }
 
 .particleButton:active {
@@ -51,15 +55,14 @@
 		0px 0px 0px 5px var(--buttonColor1),
 		inset 0px 0px 0px 5px var(--buttonColor2);
 
-	transform: translate(-50%, -50%) scale(0.9, 0.9);
+	transform: perspective(1px) translateZ(0) translate(-50%, -50%)
+		scale(0.95, 0.95);
 }
 
 .particles {
 	z-index: -1;
 	background: none !important;
 	pointer-events: none;
-	cursor: pointer;
-	box-shadow: none;
 }
 
 .particles::after {
@@ -74,6 +77,7 @@
 		background-position ease-in-out 0.5s;
 	background-repeat: no-repeat;
 	overflow: hidden;
+	transform-style: preserve-3d;
 }
 
 .particleButton:active ~ .particles::after {

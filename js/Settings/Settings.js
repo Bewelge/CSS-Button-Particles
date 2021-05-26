@@ -4,7 +4,7 @@ import {
 	getGlobalSavedSettings,
 	saveCurrentSettings
 } from "./LocalStorageHandler.js"
-import { getURLParams } from "./Util.js"
+import { getURLParams } from "../Util/Util.js"
 
 class Settings {
 	constructor(ui) {
@@ -47,7 +47,7 @@ class Settings {
 			if (this.settingsById[setting.id].type == SETTING_TYPES.DOUBLE_SLIDER) {
 				let min = urlParamSettings[setting.id].split("|")[0]
 				let max = urlParamSettings[setting.id].split("|")[1]
-				console.log(min, max)
+
 				setting.lowerValue = min
 				setting.upperValue = max
 			} else {

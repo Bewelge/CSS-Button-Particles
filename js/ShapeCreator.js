@@ -1,18 +1,16 @@
-import { SETTING_IDS } from "./DefaultSettings.js"
-import { getSetting } from "./Settings.js"
-import { angle, dist, getRange } from "./Util.js"
+import { SETTING_IDS } from "./Settings/DefaultSettings.js"
+import { getSetting } from "./Settings/Settings.js"
+import { angle, dist, getRange } from "./Util/Util.js"
 import { SHAPE_TYPES } from "./CssShapes.js"
-import { resetRng, rng } from "./Rng.js"
+import { resetRng, rng } from "./Settings/Rng.js"
 class Shape {
 	constructor(opts) {
 		this.type = opts.shapeType || SHAPE_TYPES.CIRCLE
 		this.positions = opts.positions || []
 		this.sizes = opts.sizes || []
 
-		// if (type == SHAPE_TYPES.LINE) {
 		this.color = opts.color || "black"
 		this.degree = Math.floor(rng() * 360)
-		// }
 	}
 }
 
@@ -49,7 +47,8 @@ export class ShapeCreator {
 				startRadius,
 				startSizeX,
 				startSizeY,
-				sizeChange,
+				sizeChangeMult,
+				sizeChangeAdd,
 				rotChange
 			} = this.getRandomParams(p)
 
@@ -107,11 +106,9 @@ export class ShapeCreator {
 						(Math.sin(angToMiddle) * buttonGravity * 100) /
 						Math.pow(Math.max(btnHeight / 2, disToMiddle), 2)
 
-					sizeX = Math.max(0, sizeX * sizeChange)
-					sizeY =
-						shapeType == SHAPE_TYPES.LINE
-							? sizeY
-							: Math.max(0, sizeY * sizeChange)
+					sizeX = Math.max(0, sizeX * sizeChangeMult)
+					sizeX = Math.max(0, sizeX + sizeChangeAdd)
+					sizeY = shapeType == SHAPE_TYPES.LINE ? sizeY : sizeX
 
 					direction += rotChangeInRad
 					rotChangeInRad *= angularFriction
@@ -142,7 +139,14 @@ export class ShapeCreator {
 
 		let startRadius = getRandomInRange(p.startRadius.min, p.startRadius.max)
 
-		let sizeChange = getRandomInRange(p.sizeChange.min, p.sizeChange.max)
+		let sizeChangeMult = getRandomInRange(
+			p.sizeChangeMult.min,
+			p.sizeChangeMult.max
+		)
+		let sizeChangeAdd = getRandomInRange(
+			p.sizeChangeAdd.min,
+			p.sizeChangeAdd.max
+		)
 
 		let rotChange = getRandomInRange(p.rotChange.min, p.rotChange.max)
 
@@ -154,7 +158,8 @@ export class ShapeCreator {
 			startRadius,
 			startSizeX,
 			startSizeY,
-			sizeChange,
+			sizeChangeMult,
+			sizeChangeAdd,
 			rotChange
 		}
 	}
@@ -167,7 +172,8 @@ export const paramsFromSettings = () => {
 		startAngle: getSetting(SETTING_IDS.START_ANGLE), // 0,
 		startSize: getSetting(SETTING_IDS.START_SIZE), // 0,
 		startRadius: getSetting(SETTING_IDS.START_RADIUS), // 0,
-		sizeChange: getSetting(SETTING_IDS.SIZE_CHANGE), // 0,
+		sizeChangeMult: getSetting(SETTING_IDS.SIZE_MULTIPLIER), // 0,
+		sizeChangeAdd: getSetting(SETTING_IDS.SIZE_ADDER), // 0,
 		rotChange: getSetting(SETTING_IDS.ROTATION_CHANGE), // 0,
 		speed: getSetting(SETTING_IDS.START_SPEED) // 0,
 	}

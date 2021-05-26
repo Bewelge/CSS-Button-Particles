@@ -1,5 +1,5 @@
-import { SETTING_IDS } from "./DefaultSettings.js"
-import { getSetting } from "./Settings.js"
+import { SETTING_IDS } from "./Settings/DefaultSettings.js"
+import { getSetting } from "./Settings/Settings.js"
 
 export const SHAPE_TYPES = {
 	RECTANGLE: "Rectangle",

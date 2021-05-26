@@ -1,7 +1,7 @@
 import { getCssStringForShape } from "./CssShapes.js"
-import { SETTING_IDS, SETTING_TYPES } from "./DefaultSettings.js"
-import { getAllCssSettings, getSetting, getSettingObject } from "./Settings.js"
-import { getCssVariable, replaceAllString } from "./Util.js"
+import { SETTING_IDS, SETTING_TYPES } from "./Settings/DefaultSettings.js"
+import { getAllCssSettings, getSetting } from "./Settings/Settings.js"
+import { getCssVariable, replaceAllString } from "./Util/Util.js"
 
 const NEWLINE = "\n"
 const TAB = "    "
@@ -21,7 +21,22 @@ class CssGenerator {
 		this.bgImageString = this.getBgImageString()
 		this.keyframesString = this.getKeyframeString()
 		this.buttonStyleString = this.getButtonStyleString()
-		// this.progrBarStyleString = this.getProgressBarKeyframeString()
+	}
+	appendStyleTagToBody() {
+		let styleTag = document.body.querySelector("#buttonAnimation")
+		if (styleTag) {
+			document.body.removeChild(styleTag)
+		}
+		document.body.appendChild(
+			wrapInStyleTag(
+				this.bgImageString +
+					" " +
+					this.keyframesString +
+					" " +
+					this.buttonStyleString
+			)
+		)
+		return styleTag
 	}
 	getButtonStyleString() {
 		let btnWd = getSetting(SETTING_IDS.BUTTON_WIDTH)
@@ -52,75 +67,33 @@ class CssGenerator {
 		let newline = formatted ? NEWLINE : ""
 		let tab = formatted ? TAB : ""
 		let bgImageString =
-			".animated::after { " + newline + tab + " background-image: "
+			".animated::after { " +
+			newline +
+			tab +
+			"animation: " +
+			ANIMATION_NAME +
+			" linear " +
+			getSetting(SETTING_IDS.ANIMATION_DURATION) +
+			"s forwards;"
+		bgImageString += newline + tab + "background-image: "
 		this.shapes.forEach((shape, shapeIndex) => {
 			bgImageString += newline + tab + tab + getCssStringForShape(shape)
 			if (shapeIndex < this.shapes.length - 1) {
 				bgImageString += ","
 			}
 		})
-		bgImageString +=
-			";" +
-			newline +
-			tab +
-			tab +
-			"animation: " +
-			ANIMATION_NAME +
-			" linear " +
-			getSetting(SETTING_IDS.ANIMATION_DURATION) +
-			"s forwards;" +
-			newline +
-			"}"
+		bgImageString += ";" + newline + "}"
 
 		return bgImageString
 	}
-
-	appendStyleTagToBody() {
-		let styleTag = document.body.querySelector("#buttonAnimation")
-		if (styleTag) {
-			document.body.removeChild(styleTag)
-		}
-		document.body.appendChild(
-			wrapInStyleTag(
-				this.bgImageString +
-					" " +
-					this.keyframesString +
-					" " +
-					this.buttonStyleString
-			)
-		)
-		return styleTag
-	}
-
-	// getProgressBarKeyframeString() {
-	// 	let keyframesString = "@keyframes progrBarAnim {"
-	// 	this.keyframes.forEach((keyframe, index) => {
-	// 		let perc = Math.floor(keyframe * 1000) / 10
-	// 		keyframesString += perc + "% {"
-	// 		keyframesString += "background-size: " + perc + "% 100%"
-	// 		keyframesString += "}"
-	// 	})
-	// 	keyframesString += "}"
-	// 	return (
-	// 		keyframesString +
-	// 		".progrBarAnimated {animation: progrBarAnim linear " +
-	// 		getSetting(SETTING_IDS.ANIMATION_DURATION) +
-	// 		"s forwards; }"
-	// 	)
-	// }
-
 	getKeyframeString(formated) {
 		let newline = formated ? "\n" : ""
 		let tab = formated ? "    " : ""
 
-		let transformRotate = 0
-		let transformRotateZ = 0
 		let transfRotateX = getSetting(SETTING_IDS.TRANSFORM_ROTATE_X)
 		let transfRotateY = getSetting(SETTING_IDS.TRANSFORM_ROTATE_Y)
 		let transfRotateZ = getSetting(SETTING_IDS.TRANSFORM_ROTATE_Z)
 		let transfScaleConst = getSetting(SETTING_IDS.TRANSFORM_SCALE_CONSTANT)
-		let transformScaleX = transfScaleConst
-		let transformScaleY = transfScaleConst
 		let transfScaleX = getSetting(SETTING_IDS.TRANSFORM_SCALE_X)
 		let transfScaleY = getSetting(SETTING_IDS.TRANSFORM_SCALE_Y)
 
@@ -145,12 +118,9 @@ class CssGenerator {
 			keyframesString += tab + tab + this.getBgSizeString(index) + newline
 			keyframesString += tab + tab + this.getBgPositionString(index) + newline
 			keyframesString += tab + "}"
-			// transformRotate += transformRotatePerKeyframe
-			// transformScaleX += transformScaleXPerKeyframe
-			// transformScaleY += transformScaleYPerKeyframe
 		})
 		keyframesString += "}"
-		// console.log(keyframesString)
+
 		return keyframesString
 	}
 	getTransformString(
@@ -165,16 +135,6 @@ class CssGenerator {
 		let rotateXPart = rotateX != 0 ? "rotateX(" + index * rotateX + "deg) " : ""
 		let rotateYPart = rotateY != 0 ? "rotateY(" + index * rotateY + "deg) " : ""
 		let rotateZPart = rotateZ != 0 ? "rotateZ(" + index * rotateZ + "deg) " : ""
-		// let isAnyRotateSet = rotateX != 0 || rotateY != 0 || rotateZ != 0
-		// let rotatePart = isAnyRotateSet
-		// 	? "rotate3d(" +
-		// 	  index * rotateX +
-		// 	  "deg," +
-		// 	  index * rotateY +
-		// 	  "deg," +
-		// 	  index * rotateZ +
-		// 	  "deg)"
-		// 	: ""
 
 		let isAnyScaleSet = scaleX != 0 || scaleY != 0 || scaleConst != 100
 		let scalePart = ""
@@ -211,7 +171,6 @@ class CssGenerator {
 	getBgSizeString(keyframeIndex) {
 		let sizeString = "background-size: "
 		this.shapes.forEach((shape, index) => {
-			// console.log(shape.sizes[keyframeIndex])
 			sizeString +=
 				shape.sizes[keyframeIndex][0] +
 				"px " +
@@ -261,7 +220,7 @@ export const generateAndAppendCss = retry => {
 	if (window.performance.now() - lastGenerated < 250 && !retry) {
 		window.setTimeout(() => {
 			generateAndAppendCss(true)
-		}, 250)
+		}, 260)
 	} else {
 		lastGenerated = window.performance.now()
 		theCssGen.generateCss()
@@ -272,43 +231,38 @@ export const generateAndAppendCss = retry => {
 
 export const getHtmlExportString = async () => {
 	let textContent = ""
-	await fetch("htmlTemplate.txt")
+	await fetch("../templates/htmlTemplate.txt")
 		.then(res => res.text())
 		.then(res => (textContent = res))
 	return textContent
 }
-export const escapeHtml = unsafe => {
-	return unsafe
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&#039;")
-}
+
 export const getCssExportString = async () => {
 	let textContent = ""
-	await fetch("cssTemplate.txt")
+	await fetch("../templates/cssTemplate.txt")
 		.then(res => res.text())
 		.then(res => (textContent = res))
 
 	textContent = fillRootVarsInString(textContent)
 	textContent +=
-		theCssGen.bgImageString +
+		theCssGen.getBgImageString(true) +
 		" \n" +
-		theCssGen.keyframesString +
+		theCssGen.getKeyframeString(true) +
 		" \n" +
-		theCssGen.buttonStyleString
+		theCssGen.getButtonStyleString()
 	return textContent
 }
 export const getJsExportString = async () => {
 	let textContent = ""
-	await fetch("jsTemplate.txt").then(res => (textContent = res.text()))
+	await fetch("../templates/jsTemplate.txt").then(
+		res => (textContent = res.text())
+	)
 	return textContent
 }
 
 export const getSingleHtmlTemplateString = async () => {
 	let textContent = ""
-	let templateString = await fetch("singleFileTemplate.txt")
+	await fetch("../templates/singleFileTemplate.txt")
 		.then(response => response.text())
 		.then(text => (textContent = text))
 

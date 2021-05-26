@@ -36,18 +36,23 @@
 	
 		
 		Both elements are set to <span>position: absolute</span> and are positioned exactly on top of each other. The <span>.particles</span>-element itself has no appearance. 
-		Its <span>::after</span> element is where we add the <span>@keyframes</span> animation.  
+		Its <span>::after</span> element is where we add the <span>@keyframes</span> animation. We do this by adding the class <span>.animated</span> to the <span>.particles</span>-element.
 		
 		<div class="codeBox">
 <code>
 <pre>
-.button {	
+.particleButton {	
 	position: absolute;	
 	width: 90px;	
 	height: 90px;	
 	left: 50%;	
 	top: 50%;	
 	transform: translate(-50%,-50%);	
+}
+.particles {
+	z-index: -1;
+	background: none !important;
+	pointer-events: none;
 }
 .animated::after {	
 	background-image: * All the Particles *	
@@ -61,8 +66,10 @@
 		</div>
 	
 	
-		We could also add the animation to the <span>.particles</span> element directly but then we would need to apply a <span>transform: translate(-50%,-50%)</span> to it every keyframe,
-		making the animation string longer than necessary. 
+	We could also add the animation to the <span>.particles</span> element directly but then we would need to apply a <span>transform: translate(-50%,-50%)</span> to it every keyframe,
+	making the animation string longer than necessary. 
+	</br>
+	</br>
 		In fact we could even add the animation directly to the <span>::after</span> element of the button, 
 		getting rid of the second element completely like <a href="https://codepen.io/nourabusoud/pen/ypZzMM">in this example.</a> 
 		However that would result in the particles rendering in front of the buttons background. 
@@ -70,19 +77,19 @@
 		</br>
 		</br>
 		</br>
-		To trigger the animation each time we click button, we set the animation of <span>.particles</span> to none when button is active:
+		To trigger the animation each time we click button, we set the  <span>.particles</span>-element to <span>animation: none;</span>  when the button is active:
 
 			
 		<div class="codeBox">
 <code><pre>
-#theButton:active ~ .buttonEffect {	
+button.particleButton:active ~ .particles {	
 	animation: none;	
 	background-size: 0;	
 }	
 </pre></code>
 		</div>
-		A problem with this setup is that the animation will automatically start playing once the page is loaded. To avoid that, we’ll use a bit of Javascript:
-
+		A problem with this setup is that the animation will automatically start playing once the page is loaded. To avoid that, we’ll use a bit of Javascript, only adding the <span>.animated</span> class to the element the first time the button is clicked:
+	
 		<div class="codeBox">
 <code><pre>
 window.onload = () => {
@@ -131,6 +138,10 @@ window.onload = () => {
 	</br>
 		So I started creating a particle system and dynamically generating CSS strings.  
 		After playing around with an increasing number of parameters, I noticed that you can achieve quite diverse results, so I decided make this tool to make it easier for everyone to create beautiful particle effects.
-		 Skip forward a few weeks and this tool was born 😊.
+		 Skip forward a few weeks and this tool was born 😊. 
+</br>
+</br>
+</br>
+		The source code is freely available <a href="https://github.com/Bewelge/cssParticles">on Github. </a>
 	</div>
 </div>

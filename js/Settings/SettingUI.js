@@ -1,7 +1,7 @@
 import { SETTING_TYPES } from "./DefaultSettings.js"
-import { DomHelper } from "./DomHelper.js"
-import { resetSettingsToDefault } from "./Settings.js"
-import { setCssVariable } from "./Util.js"
+import { DomHelper } from "../Util/DomHelper.js"
+import { resetSettingsToDefault, setSetting } from "./Settings.js"
+import { setCssVariable } from "../Util/Util.js"
 
 /**
  * Class to create the DOM Elements used to manipulate the settings.
@@ -181,12 +181,22 @@ export class SettingUI {
 				return SettingUI.createTextAreaSettingDiv(setting)
 		}
 	}
+	static getOnChangeFunc(setting) {
+		switch (setting.type) {
+			case SETTING_TYPES.DOUBLE_SLIDER:
+				return (lower, upper) => setSetting(setting.id, [lower, upper])
+			case SETTING_TYPES.CHECKBOX:
+				return event => setSetting(setting.id, event.target.checked)
+			default:
+				return value => setSetting(setting.id, value)
+		}
+	}
 	static createListSettingDiv(setting) {
 		let el = DomHelper.createInputSelect(
 			setting.label,
 			setting.list,
 			setting.value,
-			setting.onChange
+			SettingUI.getOnChangeFunc(setting)
 		)
 		el.classList.add("settingContainer")
 		el.updateSettingValue = () => {
@@ -201,7 +211,7 @@ export class SettingUI {
 	static createCheckboxSettingDiv(setting) {
 		let el = DomHelper.createCheckbox(
 			setting.label,
-			setting.onChange,
+			SettingUI.getOnChangeFunc(setting),
 			setting.value,
 			setting.isChecked
 		)
@@ -220,7 +230,7 @@ export class SettingUI {
 			setting.min,
 			setting.max,
 			setting.step,
-			setting.onChange
+			SettingUI.getOnChangeFunc(setting)
 		).container
 		el.classList.add("settingContainer")
 		el.updateSettingValue = () => {
@@ -238,7 +248,7 @@ export class SettingUI {
 			setting.min,
 			setting.max,
 			setting.step,
-			setting.onChange
+			SettingUI.getOnChangeFunc(setting)
 		).container
 		el.updateSettingValue = () => {
 			el.querySelector(".minSlider").value = setting.lowerValue
@@ -256,7 +266,7 @@ export class SettingUI {
 			setting.id + "Slider",
 			setting.label,
 			setting.value,
-			setting.onChange
+			SettingUI.getOnChangeFunc(setting)
 		)
 		el.classList.add("settingContainer")
 		el.updateSettingValue = () => {
@@ -269,7 +279,7 @@ export class SettingUI {
 			setting.id + "Slider",
 			setting.label,
 			setting.value,
-			setting.onChange,
+			SettingUI.getOnChangeFunc(setting),
 			5
 		)
 		el.classList.add("settingContainer")
@@ -282,7 +292,7 @@ export class SettingUI {
 		let el = DomHelper.createColorPickerText(
 			setting.label,
 			setting.value,
-			setting.onChange
+			SettingUI.getOnChangeFunc(setting)
 		)
 		el.cont.updateSettingValue = () => {
 			el.colorPicker.setColor(setting.value)
@@ -292,7 +302,7 @@ export class SettingUI {
 	static createCssColorSettingDiv(setting) {
 		let onChange = value => {
 			setCssVariable(setting.id, value)
-			setting.onChange(value)
+			SettingUI.getOnChangeFunc(setting)(value)
 		}
 		let el = DomHelper.createColorPickerText(
 			setting.label,
@@ -308,7 +318,7 @@ export class SettingUI {
 	static createCssNumberSettingDiv(setting) {
 		let onChange = value => {
 			setCssVariable(setting.id, value + setting.suffix)
-			setting.onChange(value)
+			SettingUI.getOnChangeFunc(setting)(value)
 		}
 		let formatVal = val => val + "px"
 		let el = DomHelper.createSliderWithLabelAndField(

@@ -44,6 +44,18 @@ body {
 	background-color: var(--bg4);
 	color: var(--bg5);
 	z-index: 12;
+	box-sizing: border-box;
+}
+.headerWrap a {
+	position: absolute;
+	float: right;
+	height: 80%;
+	min-width: 50px;
+	right: 0.5em;
+	top: 10%;
+}
+.headerWrap img {
+	height: 100%;
 }
 
 .mainWrapper {
@@ -54,6 +66,7 @@ body {
 }
 .buttonPreviewWrap {
 	width: 100%;
+	max-height: calc(50% - 64px);
 	z-index: 11;
 	display: flex;
 	justify-content: space-around;
@@ -62,7 +75,6 @@ body {
 	left: 0;
 	background-color: var(--bg1);
 	pointer-events: none;
-	max-height: 50%;
 	box-shadow: 0em 0.2em 10px 3px rgb(0 0 0 / 50%);
 }
 .sideFiller {
@@ -241,35 +253,6 @@ code {
 	transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 	transform: perspective(1px) translateZ(0) scale(0.86, 0.86);
 }
-/* .btn::after {
-	background-image: radial-gradient(black, black 50%, transparent 50%);
-	animation: genericBtnAnim linear 1s forwards;
-	position: absolute;
-	content: "";
-	left: -105px;
-	top: -105px;
-	min-width: 300px;
-	min-height: 300px;
-	pointer-events: none;
-	transition: background-size ease-in-out 0.5s,
-		background-position ease-in-out 0.5s;
-	background-repeat: no-repeat;
-	overflow: hidden;
-}
-.btn:active::after {
-	animation: none;
-	background-size: 0;
-}
-@keyframes genericBtnAnim {
-	0% {
-		background-size: 0% 0%;
-		background-position: 50% 50%;
-	}
-	100% {
-		background-size: 100% 100%;
-		background-position: 50% 50%;
-	}
-} */
 
 .modalWindowBg {
 	position: absolute;

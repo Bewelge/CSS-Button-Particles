@@ -371,6 +371,15 @@ function getURLParams() {
 	return new URLSearchParams(decodeURIComponent(queryString))
 }
 
+function escapeHtml(unsafe) {
+	return unsafe
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;")
+}
+
 export {
 	formatTime,
 	arrayContains,
@@ -392,5 +401,6 @@ export {
 	findSideToTurn,
 	getRange,
 	getURLParams,
-	getScrollbarWidth
+	getScrollbarWidth,
+	escapeHtml
 }
