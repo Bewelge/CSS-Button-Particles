@@ -12,16 +12,14 @@ import { paramsFromSettings, ShapeCreator } from "./ShapeCreator.js"
 import { SETTING_IDS } from "./Settings/DefaultSettings.js"
 /*
 //TODOS:
-
-sort settings
-seperate background image string box
 - add header tabs 
-	- 	github
 	-	settings
 	-	How to
 	- 	About
 - maybe only save the non-default values. Would break saved buttons on changing defaults though.
 - allow expansion of button preview div.
+- allow multiple shapes? How to handle the save/share functions then..
+- 
 */
 
 var keyframes = []
