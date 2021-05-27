@@ -58,6 +58,8 @@ export class UI {
 
 		//give pickrs some time to init
 		window.setTimeout(() => setSettingsSaveEnabled(true), 1000)
+
+		DomHelper.hideDiv(document.getElementById("loader"))
 	}
 	getMainDiv() {
 		if (this.mainDiv == null) {
