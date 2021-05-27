@@ -19,9 +19,194 @@
     
         
 
+        
+        
+        <nav class="headerWrap"></nav>
+        <div class="buttonPreviewWrap"></div>
+        <div class="mainWrapper">
+            <div class="settingsWrap"></div>
+            <div class="dividerLine"></div>
+            <div class="codeOutputWrap"></div>
+            <div class="blabla">
+                <div class="blablaWrap">
+                    <div class="blaText">
+                        <div class="blaTitle" >
+                            How to use:
+                        </div>
+                        To add a button to your own page, simply download the .zip file, or copy the CSS and Javascript individually. 
+                        You can add the html of the button wherever you want on your page. 
+                        
+                        <div class="codeBox">
+<code><pre>
+&lt;div&gt;		
+    &lt;button class=&rdquo;particleButton&rdquo;&gt;Click Me&lt;/button&gt;	
+    &lt;div class=&rdquo;particleButton particles&rdquo;&gt;&lt;/div&gt;	
+&lt;/div&gt;	
+</pre></code>
+                        </div>
+                        
+                        If you decide to create the buttons dynamically, 
+                        make sure to add an initial listener that adds the <span>.animated</span> class to the <span>.particles</span>-div on the first click.
+                    </div>
+                </div>
+
+            </div>
+            <div class="codeOutputWrap"></div>
+            <div class="blabla">
+                <div class="blablaWrap">
+                    <div class="blaText">
+                        You may also want to add the animation to a different element or trigger it at a different event. To do so, simply copy the <span>@keyframes</span> and <span>background-image</span> string and add it to your desired element. 
+                    </div>
+                </div>
+                <div class="dividerLine"></div>
+                <div class="blablaWrap">
+                    <div class="blaText">
+                        <div class="blaTitle" >
+                            How it works
+                        </div>
+                        
+                        This generator makes use of the <span>background-image</span> property and the <span>::after</span> pseudo-selector. 
+                        In the <span>background-image</span> property we can define multiple shapes and individually control the movement and size of each with the <span>background-position</span> and <span>background-size</span> properties. 
+                        Based on the chosen settings, the generator will create the particles and perform the physics/movement calculations. 
+                        This is then translated into the CSS <span>background-image</span> property and a <span>@keyframes</span> animation. Each particle is defined by one background-image. 
+                    
+                
+                        </br>
+                        </br>
+                        <div class="blaSubTitle" >
+                            In detail:
+                        </div>
+                
+                        The button consists of two elements: A button element and a div element beneath that button. 
+                        
+                        
+                        <div class="codeBox">
+<code><pre>
+&lt;div class=&rdquo;buttonWrap&rdquo;&gt;	
+    &lt;button class=&rdquo;particleButton&rdquo;&gt;Click me&lt;/button&gt;	
+    &lt;div class=&rdquo;particleButton particles animated&rdquo;&gt;&lt;/div&gt;	
+&lt;/div&gt;	
+</pre></code>
+                        </div>
+                    
+                        
+                        Both elements are set to <span>position: absolute</span> and are positioned exactly on top of each other. The <span>.particles</span>-element itself has no appearance. 
+                        Its <span>::after</span> element is where we add the <span>@keyframes</span> animation. We do this by adding the class <span>.animated</span> to the <span>.particles</span>-element.
+                        
+                        <div class="codeBox">
+<code>
+<pre>
+.particleButton {	
+    position: absolute;	
+    width: 90px;	
+    height: 90px;	
+    left: 50%;	
+    top: 50%;	
+    transform: translate(-50%,-50%);	
+}
+.particles {
+    z-index: -1;
+    background: none !important;
+    pointer-events: none;
+}
+.animated::after {	
+    background-image: * All the Particles *	
+    animation: particleAnimation linear 1s forwards;	
+}
+@keyframes particleAnimation { 	
+    * All the particles sizes and positions *	
+}
+</pre>
+</code>
+                        </div>
+                    
+                    
+                    We could also add the animation to the <span>.particles</span> element directly but then we would need to apply a <span>transform: translate(-50%,-50%)</span> to it every keyframe,
+                    making the animation string longer than necessary. 
+                    </br>
+                    </br>
+                        In fact we could even add the animation directly to the <span>::after</span> element of the button, 
+                        getting rid of the second element completely like <a href="https://codepen.io/nourabusoud/pen/ypZzMM">in this example.</a> 
+                        However that would result in the particles rendering in front of the buttons background. 
+                        
+                        </br>
+                        </br>
+                        </br>
+                        To trigger the animation each time we click button, we set the  <span>.particles</span>-element to <span>animation: none;</span>  when the button is active:
+                
+                            
+                        <div class="codeBox">
+<code><pre>
+button.particleButton:active ~ .particles {	
+    animation: none;	
+    background-size: 0;	
+}	
+</pre></code>
+                        </div>
+                        A problem with this setup is that the animation will automatically start playing once the page is loaded. To avoid that, we’ll use a bit of Javascript, only adding the <span>.animated</span> class to the element the first time the button is clicked:
+                    
+                        <div class="codeBox">
+<code><pre>
+window.onload = () => {
+    let btn = document.querySelector("button.particleButton")	
+    let btnBG = btn.parentNode.querySelector(.particles)	
+
+    let initalListener = () => {	
+        btnBG.classList.add("animated")	
+        btn.removeEventListener("click", initalListener)	
+    }
+    btn.addEventListener("click", initalListener)	
+}
+</pre></code>
+                        </div>
+                
+                        This will add an EventListener to all the particle-buttons on pageload and only add the <span>.animated</span> class to the <span>.particles</span>-element the first time the button is clicked. 
+                    </div>
+                </div>
+                <div class="dividerLine"></div>
+                <div class="blablaWrap">
+                    <div class="blaText">
+                        <div class="blaTitle">Browser support</div>
+                        These buttons should work in all modern browsers: They do not work in Internet Explorer. 
+                        </br>
+                        </br>
+                        <div class="blaSubTitle">Other notes: </div>
+                        Creating animations with many frames and particles can cause your site to become laggy, so use with caution and thoroughly test before adding this into production. 
+                        </br>
+                        </br>
+                        Chrome sometimes displays some weird rendering artifacts when scaling the entire .particles element. When particles are drawn on the edge of the element and the element is scaled down, there will be ugly artifacts left at the previous edges, as if the previous image isn't properly cleared.
+                        </br>
+                        </br>
+                        You can use the <span><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion">prefers-reduced-motion</a></span> CSS media feature to hide motion-intense animations from users that opted for less animations on their system.
+                
+                
+                    </div>
+                </div>
+                <div class="dividerLine"></div>
+                <div class="blablaWrap">
+                    <div class="blaText">
+                        <div class="blaTitle">About this tool</div>
+                        While working on a game I was making, I wanted to add a nice particle effect to the in-game buttons. Searching for a CSS solution I found 
+                        <a href="https://codepen.io/nourabusoud/pen/ypZzMM">this awesome Codepen</a> by Nour Saud. 
+                        Then I wondered if its possible to create such animations automatically rather than defining each particle, its size and position at each keyframe one by one. After all, particles are supposed to be somewhat random.
+                    </br>
+                    </br>
+                        So I started creating a particle system and dynamically generating CSS strings.  
+                        After playing around with an increasing number of parameters, I noticed that you can achieve quite diverse results, so I decided build this tool to make it easier for everyone to create beautiful particle effects.
+                         Skip forward a few weeks and this tool was born 😊. 
+                </br>
+                </br>
+                </br>
+                        The source code is available <a href="https://github.com/Bewelge/cssParticles">on Github. </a>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
         <script src="./lib/Pickr/pickr.es5.min.js"></script>
         <script src="./lib/jszip.min.js"></script>
         <script type="module" src="js/main.js"></script>
-     
+
     </body>
 </html>

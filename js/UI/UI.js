@@ -6,7 +6,8 @@ import {
 	getSettingsDiv,
 	setSettingCallback,
 	loadAButton,
-	setSetting
+	setSetting,
+	setSettingsSaveEnabled
 } from "../Settings/Settings.js"
 import {
 	getCssGenerator,
@@ -25,7 +26,7 @@ import {
 
 export class UI {
 	constructor() {
-		document.body.appendChild(this.getMainDiv())
+		this.getMainDiv()
 		DomHelper.initDoubleSliders()
 
 		this.getButtonPreviewDiv().style.marginTop =
@@ -40,7 +41,7 @@ export class UI {
 				(this.getButtonPreviewDiv().clientHeight +
 					this.getHeader().clientHeight) +
 				"px)"
-			this.mainDiv.style.marginTop =
+			this.mainDiv.style.top =
 				this.getButtonPreviewDiv().clientHeight +
 				this.getHeader().clientHeight +
 				"px"
@@ -48,38 +49,34 @@ export class UI {
 				this.getHeader().clientHeight + "px"
 			this.getButtonPreviewDiv().style.maxHeight =
 				"calc(50% - " + this.getHeader().clientHeight + "px)"
+
+			document.querySelector(".buttonWrap").style.minHeight =
+				"calc(50% - " + this.getHeader().clientHeight + "px)"
 		}
 		resizeFunc()
 		window.addEventListener("resize", resizeFunc)
+
+		//give pickrs some time to init
+		window.setTimeout(() => setSettingsSaveEnabled(true), 1000)
 	}
 	getMainDiv() {
 		if (this.mainDiv == null) {
-			this.mainDiv = DomHelper.createDivWithClass("mainWrapper")
+			this.mainDiv = document.querySelector(".mainWrapper")
 
-			this.mainDiv.appendChild(this.getHeader())
-			//button preview
-			this.mainDiv.appendChild(this.getButtonPreviewDiv())
-
-			// this.mainDiv.appendChild(this.getAnimationProgressBar())
-			//Settings
-			this.mainDiv.appendChild(this.getSettingsDiv())
-			this.mainDiv.appendChild(DomHelper.createDivWithClass("dividerLine"))
-
-			this.mainDiv.appendChild(this.getCodeOutputDiv1())
-
-			this.addBlablaContent1(this.mainDiv)
-			this.mainDiv.appendChild(this.getCodeOutputDiv2())
-
-			this.addBlablaContent2(this.mainDiv)
-			//text
-			// this.mainDiv.appendChild()
+			this.getHeader()
+			this.getButtonPreviewDiv()
+			this.getSettingsDiv()
+			this.getCodeOutputDiv1()
+			this.getCodeOutputDiv2()
 		}
 		return this.mainDiv
 	}
 	getHeader() {
 		if (this.headerDiv == null) {
-			this.headerDiv = DomHelper.createElementWithClass("headerWrap", "nav")
-			this.headerDiv.innerHTML = "CSS Particle Button Generator"
+			this.headerDiv = document.querySelector(".headerWrap")
+			let span = DomHelper.createElement("span")
+			span.innerHTML = "CSS Particle Button Generator"
+			this.headerDiv.appendChild(span)
 
 			let githubLink = document.createElement("a")
 			githubLink.href = "https://github.com/Bewelge/cssParticles"
@@ -92,7 +89,7 @@ export class UI {
 	}
 	getButtonPreviewDiv() {
 		if (this.buttonPreviewDiv == null) {
-			this.buttonPreviewDiv = DomHelper.createDivWithClass("buttonPreviewWrap")
+			this.buttonPreviewDiv = document.querySelector(".buttonPreviewWrap")
 
 			let btn = this.getPreviewButton()
 
@@ -142,8 +139,10 @@ export class UI {
 			const btnDiv = DomHelper.createDivWithClass("btnName")
 			btnDiv.innerHTML = btnName
 			btnDiv.onclick = () => {
-				setSetting(SETTING_IDS.BUTTON_NAME, btnName)
+				setSettingsSaveEnabled(false)
 				loadAButton(savedButtons[btnName])
+				setSetting(SETTING_IDS.BUTTON_NAME, btnName)
+				setSettingsSaveEnabled(true)
 			}
 
 			const btnDeleteDiv = DomHelper.createDivWithClass("")
@@ -231,14 +230,14 @@ export class UI {
 	// }
 	getSettingsDiv() {
 		if (this.settingsDiv == null) {
-			this.settingsDiv = DomHelper.createDivWithClass("settingsWrap")
+			this.settingsDiv = document.querySelector(".settingsWrap")
 			this.settingsDiv.appendChild(getSettingsDiv(getSettingsDiv()))
 		}
 		return this.settingsDiv
 	}
 	getCodeOutputDiv1() {
 		if (this.codeOutputDiv1 == null) {
-			this.codeOutputDiv1 = DomHelper.createDivWithClass("codeOutputWrap")
+			this.codeOutputDiv1 = document.querySelectorAll(".codeOutputWrap")[0]
 
 			this.codeOutputDiv1.appendChild(this.getMultiCodeBox())
 		}
@@ -246,7 +245,7 @@ export class UI {
 	}
 	getCodeOutputDiv2() {
 		if (this.codeOutputDiv2 == null) {
-			this.codeOutputDiv2 = DomHelper.createDivWithClass("codeOutputWrap")
+			this.codeOutputDiv2 = document.querySelectorAll(".codeOutputWrap")[1]
 
 			let cssKeyframeBox = createCodeBox(
 				"keyframesCss",
@@ -371,20 +370,6 @@ export class UI {
 			this.multiCodebox.appendChild(downloadBtn)
 		}
 		return this.multiCodebox
-	}
-	addBlablaContent1() {
-		let bla = DomHelper.createElementWithId("blabla")
-		fetch("../../templates/blablaText1.txt")
-			.then(res => res.text())
-			.then(res => (bla.innerHTML = res))
-		this.mainDiv.appendChild(bla)
-	}
-	addBlablaContent2() {
-		let bla = DomHelper.createElementWithId("blabla")
-		fetch("../../templates/blablaText2.txt")
-			.then(res => res.text())
-			.then(res => (bla.innerHTML = res))
-		this.mainDiv.appendChild(bla)
 	}
 }
 function createModalWindow(title, elements) {
