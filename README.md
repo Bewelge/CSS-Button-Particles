@@ -2,7 +2,7 @@
 
 ## Tool to generate CSS particle effects for buttons
 
-### [DEMO](https://bewelge.github.io/cssParticles/)
+### [DEMO](https://bewelge.github.io/CSS-Button-Particles/)
 
 This tool provides an easy way to create particle effects for buttons. It works by defining a shape for each particle via background-image and moving it around/ resizing it via background-position and background-size.
 

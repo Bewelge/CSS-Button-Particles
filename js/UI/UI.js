@@ -79,7 +79,7 @@ export class UI {
 			this.headerDiv.appendChild(span)
 
 			let githubLink = document.createElement("a")
-			githubLink.href = "https://github.com/Bewelge/cssParticles"
+			githubLink.href = "https://github.com/Bewelge/CSS-Button-Particles"
 			let githubLogo = document.createElement("img")
 			githubLogo.src = "./github.svg"
 			githubLink.appendChild(githubLogo)
