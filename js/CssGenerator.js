@@ -58,8 +58,9 @@ class CssGenerator {
 				"border-radius": getSetting(SETTING_IDS.BUTTON_BORDER_RADIUS) + "px"
 			},
 			".buttonWrap": {
-				width: Math.min(window.innerWidth, btnEffectWd) + "px",
-				height: Math.min(400, btnEffectHt) + "px"
+				width: Math.min(window.innerWidth, btnEffectWd) + "px"
+				// height:
+				// 	Math.min(400, Math.max(window.innerHeight / 2, btnEffectHt)) + "px"
 			}
 		})
 	}

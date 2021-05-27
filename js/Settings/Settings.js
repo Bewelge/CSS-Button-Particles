@@ -1,4 +1,8 @@
-import { getDefaultSettings, SETTING_TYPES } from "./DefaultSettings.js"
+import {
+	getDefaultSettings,
+	SETTING_IDS,
+	SETTING_TYPES
+} from "./DefaultSettings.js"
 import { SettingUI } from "./SettingUI.js"
 import {
 	getGlobalSavedSettings,
@@ -12,6 +16,7 @@ class Settings {
 		let savedSettings = getGlobalSavedSettings()
 		this.resetCallbacks = []
 		this.loadCallbacks = []
+		this.saveEnabled = false
 
 		let urlParams = getURLParams()
 		let entries = urlParams.entries()
@@ -122,7 +127,9 @@ export const setSetting = (settingId, value) => {
 	}
 	settingGeneralCallbacks.forEach(callback => callback())
 
-	saveCurrentSettings()
+	if (globalSettings.saveEnabled) {
+		saveCurrentSettings()
+	}
 }
 
 export const getASettingDiv = settingId => {
@@ -178,6 +185,9 @@ export const getSettingObject = () => {
 				max: globalSettings.settingsById[key].upperValue
 			}
 		} else {
+			if (key == SETTING_IDS.TRANSFORM_ROTATE_Z) {
+				console.log("hi")
+			}
 			obj[key] = globalSettings.settingsById[key].value
 		}
 	}
@@ -185,6 +195,19 @@ export const getSettingObject = () => {
 }
 
 export const resetSettingsToDefault = () => {
+	resetSettingsInternal()
+
+	globalSettings.resetCallbacks.forEach(callback => callback())
+	if (globalSettings.saveEnabled) {
+		saveCurrentSettings()
+	}
+}
+
+export const setSettingsSaveEnabled = enabled => {
+	globalSettings.saveEnabled = enabled
+}
+
+function resetSettingsInternal() {
 	let defaultSettings = getDefaultSettings()
 	Object.keys(defaultSettings).forEach(tabId =>
 		Object.keys(defaultSettings[tabId]).forEach(categoryId =>
@@ -202,12 +225,9 @@ export const resetSettingsToDefault = () => {
 			})
 		)
 	)
-
-	globalSettings.resetCallbacks.forEach(callback => callback())
-	saveCurrentSettings()
 }
 export const loadAButton = settingsObj => {
-	resetSettingsToDefault()
+	resetSettingsInternal()
 	Object.keys(settingsObj).forEach(settingId => {
 		let val = settingsObj[settingId]
 		if (globalSettings.settingsById.hasOwnProperty(settingId)) {

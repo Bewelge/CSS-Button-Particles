@@ -609,7 +609,11 @@ export class DomHelper {
 				.getColor()
 				.toRGBA()
 				.toString()
-			onChange(color.toRGBA().toString())
+			if (
+				colorButtonContainer.style.backgroundColor != color.toRGBA().toString()
+			) {
+				onChange(color.toRGBA().toString())
+			}
 		})
 
 		return { cont, colorPicker }
