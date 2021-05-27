@@ -374,14 +374,14 @@ export class UI {
 	}
 	addBlablaContent1() {
 		let bla = DomHelper.createElementWithId("blabla")
-		fetch("../../templates/blablaText1.html")
+		fetch("../../templates/blablaText1.txt")
 			.then(res => res.text())
 			.then(res => (bla.innerHTML = res))
 		this.mainDiv.appendChild(bla)
 	}
 	addBlablaContent2() {
 		let bla = DomHelper.createElementWithId("blabla")
-		fetch("../../templates/blablaText2.html")
+		fetch("../../templates/blablaText2.txt")
 			.then(res => res.text())
 			.then(res => (bla.innerHTML = res))
 		this.mainDiv.appendChild(bla)

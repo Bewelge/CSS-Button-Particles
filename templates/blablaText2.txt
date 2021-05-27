@@ -137,11 +137,11 @@ window.onload = () => {
 	</br>
 	</br>
 		So I started creating a particle system and dynamically generating CSS strings.  
-		After playing around with an increasing number of parameters, I noticed that you can achieve quite diverse results, so I decided make this tool to make it easier for everyone to create beautiful particle effects.
+		After playing around with an increasing number of parameters, I noticed that you can achieve quite diverse results, so I decided build this tool to make it easier for everyone to create beautiful particle effects.
 		 Skip forward a few weeks and this tool was born 😊. 
 </br>
 </br>
 </br>
-		The source code is freely available <a href="https://github.com/Bewelge/cssParticles">on Github. </a>
+		The source code is available <a href="https://github.com/Bewelge/cssParticles">on Github. </a>
 	</div>
 </div>
