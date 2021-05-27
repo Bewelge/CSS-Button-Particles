@@ -47,7 +47,7 @@ body {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	flex-direction: row;
 	min-height: 50px;
 	padding-left: 1em;
@@ -72,6 +72,8 @@ body {
 	background-color: var(--bg5);
 	height: calc(100% - 500px);
 	overflow-y: scroll;
+	width: 100%;
+	overflow-x: hidden;
 }
 .buttonPreviewWrap {
 	width: 100%;
