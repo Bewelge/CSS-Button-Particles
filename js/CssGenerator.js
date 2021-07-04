@@ -251,7 +251,7 @@ export const generateAndAppendCss = (buttonName, opts, formated, retry) => {
 
 export const getHtmlExportString = async () => {
 	let textContent = ""
-	await fetch("../templates/htmlTemplate.txt")
+	await fetch("./templates/htmlTemplate.txt?raw=true")
 		.then(res => res.text())
 		.then(res => (textContent = res))
 	return textContent
@@ -259,7 +259,7 @@ export const getHtmlExportString = async () => {
 
 export const getCssExportString = async (opts, buttonName, formatted) => {
 	let textContent = ""
-	await fetch("../templates/cssTemplate.txt")
+	await fetch("./templates/cssTemplate.txt")
 		.then(res => res.text())
 		.then(res => (textContent = res))
 
@@ -274,7 +274,7 @@ export const getCssExportString = async (opts, buttonName, formatted) => {
 }
 export const getJsExportString = async () => {
 	let textContent = ""
-	await fetch("../templates/jsTemplate.txt").then(
+	await fetch("./templates/jsTemplate.txt").then(
 		res => (textContent = res.text())
 	)
 	return textContent
@@ -282,7 +282,7 @@ export const getJsExportString = async () => {
 
 export const getSingleHtmlTemplateString = async () => {
 	let textContent = ""
-	await fetch("../templates/singleFileTemplate.txt")
+	await fetch("./templates/singleFileTemplate.txt")
 		.then(response => response.text())
 		.then(text => (textContent = text))
 
