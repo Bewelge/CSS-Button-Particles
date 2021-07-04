@@ -1,4 +1,4 @@
-import { SETTING_IDS } from "./Settings/DefaultSettings.js"
+import { getADefaultSetting, SETTING_IDS } from "./Settings/DefaultSettings.js"
 import { getSetting } from "./Settings/Settings.js"
 import { angle, dist, getRange } from "./Util/Util.js"
 import { SHAPE_TYPES } from "./CssShapes.js"
@@ -240,7 +240,7 @@ function getPositionAdjustments(shapeType, sizeY, sizeX) {
 }
 
 function getStartRotation(p, i, spawnAngle) {
-	let isAngleSpreadEvenly = p[SETTING_IDS.ANGLE_SPREAD_EVENLY]
+	let isAngleSpreadEvenly = p[SETTING_IDS.ANGLE_SPREAD_EVENLY] || getADefaultSetting(SETTING_IDS.ANGLE_SPREAD_EVENLY)
 	return isAngleSpreadEvenly
 		? p.spawnAngle.min +
 				Math.max(0, (i + 1) / p.particleAmount) * getRange(p.spawnAngle)

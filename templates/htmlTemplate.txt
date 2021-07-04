@@ -11,8 +11,8 @@
     
     <body>
         <div class='buttonWrap'>
-            <button class='particleButton'>Click me</button>
-            <div class='particleButton particles'></div>
+            <button class='theButton particleButton'>Click me</button>
+            <div class='theButton particleButton particles'></div>
         </div>
     <script src="main.js"></script>
     </body>
