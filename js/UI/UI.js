@@ -82,6 +82,7 @@ export class UI {
 	}
 	getPreviews() {
 		let prevDiv = document.getElementById("previewsButtons")
+		document.querySelector("#previews h1").appendChild(this.getGithubLinkEl())
 		let buttons = getExampleButtons()
 		Object.keys(buttons).forEach(buttonName => {
 			prevDiv.appendChild(this.getAButtonPreviewDiv(buttonName))
@@ -122,14 +123,18 @@ export class UI {
 			span.innerHTML = "CSS Particle Button Generator"
 			this.headerDiv.appendChild(span)
 
-			let githubLink = document.createElement("a")
+		
+			this.headerDiv.appendChild(this.getGithubLinkEl())
+		}
+		return this.headerDiv
+	}
+	getGithubLinkEl() {
+		let githubLink = document.createElement("a")
 			githubLink.href = "https://github.com/Bewelge/CSS-Button-Particles"
 			let githubLogo = document.createElement("img")
 			githubLogo.src = "./github.svg"
 			githubLink.appendChild(githubLogo)
-			this.headerDiv.appendChild(githubLink)
-		}
-		return this.headerDiv
+			return githubLink
 	}
 	getAButtonPreviewDiv(buttonId) {
 		let cont = DomHelper.createDivWithClass("buttonPreviewCont")

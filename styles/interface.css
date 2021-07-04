@@ -366,9 +366,26 @@ code {
 	z-index: 100001;
 	background-color: var(--bg1);
 	
-}
-#previews h1,#previews  h4 {
 	color:var(--bg5)
+}
+#previews h1 a {
+	position: absolute;
+	right:25px;
+	top:25px;
+	width:40px;
+	height:40px;
+	border-radius:50%;
+	padding:5px;
+	background-color: rgba(255,255,255,0.5);
+	box-shadow:0em 0em 10px 10px rgba(255,255,255,0.5);
+	transition: box-shadow 0.5s ease-out;
+
+}
+#previews h1 a:hover {
+	box-shadow: 0em 0em 10px 10px rgba(255,255,255,0.8);
+}
+#previews h1 a img {
+	height:100%;
 }
 #previewsButtons {
 
