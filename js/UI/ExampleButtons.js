@@ -173,7 +173,7 @@ const exampleButtons = {
 		transScaY: 0,
 		seed: 7713,
 		animationDuration: 0.5,
-		keyframes: 33,
+		keyframes: 28,
 		shape: "Circle",
 		partCol:
 			"#d4e157",
@@ -268,7 +268,7 @@ const exampleButtons = {
 		shapeStr:
 			"radial-gradient(circle, black  30%, transparent 35%, black 40%, transparent 45%, black 50%, transparent 55%)",
 		startSiz: { min: 50, max: 67 },
-		sizeChange: { min: 0.984, max: 0.985 },
+		sizeChange: { min: 0.983, max: 0.984 },
 		spawnAngle: { min: 0, max: 360 },
 		anglSprd: false,
 		startAngle: { min: -60, max: 60 },
@@ -452,7 +452,7 @@ const exampleButtons = {
 		shapeStr:
 			"radial-gradient(circle, black  30%, transparent 35%, black 40%, transparent 45%, black 50%, transparent 55%)",
 		startSiz: { min: 15, max: 70 },
-		sizeChange: { min: 0.99, max: 0.995 },
+		sizeChange: { min: 0.99, max: 0.994 },
 		spawnAngle: { min: 0, max: 360 },
 		anglSprd: "true",
 		startAngle: { min: -15, max: 15 },
