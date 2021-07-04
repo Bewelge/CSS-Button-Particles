@@ -99,11 +99,16 @@ body {
 	cursor: pointer;
 	pointer-events: all;
 }
+.buttonPreviewCont {
+	
+}
 .buttonWrap {
 	z-index: 1;
 	position: relative;
 	width: 400px;
+	height: 400px;
 	max-width: 50%;
+	overflow: visible;
 }
 .settingsWrap {
 	z-index: 11;
@@ -340,7 +345,6 @@ code {
 	transition: all 0.2s ease-out;
 	cursor: pointer;
 	background-color: var(--bg5);
-	/* transform: scale(1.5, 1.5); */
 }
 
 .dividerLine {
@@ -350,6 +354,32 @@ code {
 	margin-top: 50px;
 	margin-bottom: 50px;
 }
+#previews {
+	position: absolute;
+	display: block;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	z-index: 100001;
+	background-color: var(--bg1);
+	
+}
+#previews h1,#previews  h4 {
+	color:var(--bg5)
+}
+#previewsButtons {
+
+	display: flex;
+	justify-content: center;
+	flex-direction: row;
+	align-items: center;
+	flex-wrap: wrap;
+	align-content: stretch;
+}
+
 #loader {
 	position: absolute;
 	top: 0;

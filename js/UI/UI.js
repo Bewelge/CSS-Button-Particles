@@ -7,25 +7,44 @@ import {
 	setSettingCallback,
 	loadAButton,
 	setSetting,
-	setSettingsSaveEnabled
+	setSettingsSaveEnabled,
+	getSettingObject,
+	parseSettingValue
 } from "../Settings/Settings.js"
 import {
 	getCssGenerator,
 	getHtmlExportString,
 	getJsExportString,
 	getCssExportString,
-	getSingleHtmlTemplateString
+	getSingleHtmlTemplateString,
+	generateAndAppendCss
 } from "../CssGenerator.js"
-import { SETTING_IDS } from "../Settings/DefaultSettings.js"
-import { getScrollbarWidth, setCssVariable, escapeHtml } from "../Util/Util.js"
+import {
+	getADefaultSetting as getDefaultSettingById,
+	getDefaultSettings,
+	SETTING_IDS,
+	SETTING_TYPES
+} from "../Settings/DefaultSettings.js"
+import {
+	getScrollbarWidth,
+	setCssVariable,
+	escapeHtml,
+	replaceAllString
+} from "../Util/Util.js"
 import {
 	deleteSavedButton,
 	getSavedButtons,
 	saveCurrentButtonInLocalStorage
 } from "../Settings/LocalStorageHandler.js"
+import { getExampleButtons } from "./ExampleButtons.js"
+import { getKeyframes } from "../Keyframes.js"
+import { getShapesFromSettings } from "../ShapeCreator.js"
+import { SettingUI } from "../Settings/SettingUI.js"
 
 export class UI {
 	constructor() {
+		this.getPreviews()
+
 		this.getMainDiv()
 		DomHelper.initDoubleSliders()
 
@@ -50,7 +69,7 @@ export class UI {
 			this.getButtonPreviewDiv().style.maxHeight =
 				"calc(50% - " + this.getHeader().clientHeight + "px)"
 
-			document.querySelector(".buttonWrap").style.minHeight =
+			this.getButtonPreviewDiv().querySelector(".buttonWrap").style.minHeight =
 				"calc(50% - " + this.getHeader().clientHeight + "px)"
 		}
 		resizeFunc()
@@ -60,6 +79,29 @@ export class UI {
 		window.setTimeout(() => setSettingsSaveEnabled(true), 1000)
 
 		DomHelper.hideDiv(document.getElementById("loader"))
+	}
+	getPreviews() {
+		let prevDiv = document.getElementById("previewsButtons")
+		let buttons = getExampleButtons()
+		Object.keys(buttons).forEach(buttonName => {
+			prevDiv.appendChild(this.getAButtonPreviewDiv(buttonName))
+			let keyframes = getKeyframes(
+				buttons[buttonName][SETTING_IDS.KEYFRAME_AMOUNT]
+			)
+
+			Object.keys(SETTING_IDS).forEach(key => {
+				let id = SETTING_IDS[key]
+				if (!buttons[buttonName].hasOwnProperty(id)) {
+					let defaultSetting = getDefaultSettingById(id)
+					buttons[buttonName][id] = parseSettingValue(id, defaultSetting)
+				}
+		
+			})
+
+			let shapes = getShapesFromSettings(keyframes, buttons[buttonName])
+			getCssGenerator().setData(keyframes, shapes)
+			generateAndAppendCss(buttonName, buttons[buttonName], false)
+		})
 	}
 	getMainDiv() {
 		if (this.mainDiv == null) {
@@ -89,16 +131,57 @@ export class UI {
 		}
 		return this.headerDiv
 	}
+	getAButtonPreviewDiv(buttonId) {
+		let cont = DomHelper.createDivWithClass("buttonPreviewCont")
+
+		
+		let buttonName = replaceAllString(buttonId, " ", "")
+		let btn = this.getAPreviewButton(buttonName)
+
+		let btnBG = DomHelper.createDivWithClass(
+			"particleButton " + buttonName + " particles"
+		)
+		let initalListener = () => {
+			btnBG.classList.add("animated")
+
+			btnBG.removeEventListener("click", initalListener)
+		}
+		btn.addEventListener("click", initalListener)
+
+		let btnWrap = DomHelper.createDivWithClass("buttonWrap")
+		btnWrap.appendChild(btn)
+		btnWrap.appendChild(btnBG)
+
+		
+		let openInEditorBtn = DomHelper.createTextButton("openInEditor"+buttonName,"Open in Editor",() => {
+			loadAButton(getExampleButtons()[buttonId])
+			DomHelper.hideDiv( document.getElementById("previews"))
+			
+			
+			// let keyframes = getKeyframes(
+				// 	buttons[buttonName][SETTING_IDS.KEYFRAME_AMOUNT]
+				// )
+				// let shapes = getShapesFromSettings(keyframes, buttons[buttonName])
+				// getCssGenerator().setData(keyframes, shapes)
+				// generateAndAppendCss(buttonName, buttons[buttonName], false)
+			})
+			cont.appendChild(btnWrap)
+			cont.appendChild(openInEditorBtn)
+
+		return cont
+	}
 	getButtonPreviewDiv() {
 		if (this.buttonPreviewDiv == null) {
 			this.buttonPreviewDiv = document.querySelector(".buttonPreviewWrap")
 
 			let btn = this.getPreviewButton()
 
-			let btnBG = DomHelper.createDivWithClass("particleButton particles")
+			let btnBG = DomHelper.createDivWithClass(
+				"particleButton particles theButton"
+			)
 			let initalListener = () => {
 				btnBG.classList.add("animated")
-				// document.querySelector(".progrBar").classList.add("progrBarAnimated")
+
 				btnBG.removeEventListener("click", initalListener)
 			}
 			btn.addEventListener("click", initalListener)
@@ -213,13 +296,17 @@ export class UI {
 
 		document.body.appendChild(modal)
 	}
+	getAPreviewButton(buttonName) {
+		let previewButton = DomHelper.createElementWithClass(
+			"particleButton " + buttonName,
+			"button"
+		)
+		previewButton.innerHTML = "Click me"
+		return previewButton
+	}
 	getPreviewButton() {
 		if (this.previewButton == null) {
-			this.previewButton = DomHelper.createElementWithClass(
-				"particleButton",
-				"button"
-			)
-			this.previewButton.innerHTML = "Click me"
+			this.previewButton = this.getAPreviewButton("theButton")
 		}
 		return this.previewButton
 	}
@@ -254,7 +341,12 @@ export class UI {
 				"CSS @keyframe animation",
 				getCssGenerator().keyframesString,
 				SETTING_IDS.KEYFRAME_COMPACT,
-				val => getCssGenerator().getKeyframeString(val)
+				val =>
+					getCssGenerator().getKeyframeString(
+						getSettingObject(),
+						val,
+						"theButton"
+					)
 			)
 
 			let cssBgImageBox = createCodeBox(
@@ -262,7 +354,12 @@ export class UI {
 				"CSS background-image",
 				getCssGenerator().bgImageString,
 				SETTING_IDS.BG_IMG_COMPACT,
-				val => getCssGenerator().getBgImageString(val)
+				val =>
+					getCssGenerator().getBgImageString(
+						getSettingObject(),
+						val,
+						"theButton"
+					)
 			)
 
 			this.codeOutputDiv2.appendChild(cssKeyframeBox)
@@ -280,7 +377,8 @@ export class UI {
 				},
 				{
 					name: "CSS",
-					onFormat: formatted => getCssExportString(formatted),
+					onFormat: formatted =>
+						getCssExportString(getSettingObject(), "theButton", formatted),
 					fileName: "interface.css"
 				},
 				{

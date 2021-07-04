@@ -6,10 +6,12 @@ import {
 	getSetting,
 	initSettingDependencies,
 	setCallbackIf as setSettingCallbackIf,
-	setGeneralSettingCallback
+	setGeneralSettingCallback,
+	getSettingObject
 } from "./Settings/Settings.js"
-import { paramsFromSettings, ShapeCreator } from "./ShapeCreator.js"
+import { getShapesFromSettings, paramsFromSettings } from "./ShapeCreator.js"
 import { SETTING_IDS } from "./Settings/DefaultSettings.js"
+import { getKeyframes } from "./Keyframes.js"
 /*
 //TODOS:
 - add header tabs 
@@ -26,7 +28,9 @@ var keyframes = []
 var shapes = []
 refresh()
 
-setGeneralSettingCallback(() => generateAndAppendCss())
+setGeneralSettingCallback(() =>
+	generateAndAppendCss("theButton", getSettingObject(), true)
+)
 addResetCallback(() => {
 	refresh()
 })
@@ -44,12 +48,9 @@ new UI()
 initSettingDependencies()
 
 function refresh() {
-	keyframes = []
-	let keyframeAmount = getSetting(SETTING_IDS.KEYFRAME_AMOUNT)
-	for (let i = 0; i <= keyframeAmount; i++) {
-		keyframes.push(i / keyframeAmount)
-	}
-	shapes = new ShapeCreator(keyframes, paramsFromSettings()).create()
+	keyframes = getKeyframes(getSetting(SETTING_IDS.KEYFRAME_AMOUNT))
+
+	shapes = getShapesFromSettings(keyframes, paramsFromSettings())
 	getCssGenerator().setData(keyframes, shapes)
-	generateAndAppendCss()
+	generateAndAppendCss("theButton", getSettingObject(), true)
 }

@@ -112,6 +112,20 @@ export const getSetting = settingId => {
 		? parseFloatIfNotNaN(globalSettings.settingsById[settingId].value)
 		: null
 }
+
+export const parseSettingValue = (settingId, setting) => {
+	if (isSettingMinMaxSlider(settingId)) {
+		return {
+			min: parseFloatIfNotNaN(
+				setting.hasOwnProperty("lowerValue") ? setting.lowerValue : setting.min
+			),
+			max: parseFloatIfNotNaN(
+				setting.hasOwnProperty("upperValue") ? setting.upperValue : setting.max
+			)
+		}
+	}
+	return parseFloatIfNotNaN(setting.value)
+}
 export const setSetting = (settingId, value) => {
 	if (isSettingMinMaxSlider(settingId)) {
 		globalSettings.settingsById[settingId].lowerValue = value[0]
@@ -185,9 +199,6 @@ export const getSettingObject = () => {
 				max: globalSettings.settingsById[key].upperValue
 			}
 		} else {
-			if (key == SETTING_IDS.TRANSFORM_ROTATE_Z) {
-				console.log("hi")
-			}
 			obj[key] = globalSettings.settingsById[key].value
 		}
 	}

@@ -19,6 +19,19 @@ export const getDefaultSettings = () => {
 	}
 	return copy
 }
+export const getADefaultSetting = settingId => {
+	let setting = null
+	Object.keys(defaultSettings).forEach(tab =>
+		Object.keys(defaultSettings[tab]).forEach(cat =>
+			defaultSettings[tab][cat].forEach(aSetting => {
+				if (aSetting.id == settingId) {
+					setting = aSetting
+				}
+			})
+		)
+	)
+	return setting
+}
 export const SETTING_TYPES = {
 	LIST: "list",
 	SLIDER: "slider",
@@ -39,9 +52,6 @@ export const SETTING_IDS = {
 	//Shape
 	SHAPE_TYPE: "shape",
 	SHAPE_STRING: "shapeStr",
-	SHAPE_COLOR1: "shapeColor1",
-	SHAPE_COLOR2: "shapeColor2",
-	SHAPE_COLOR3: "shapeColor3",
 	//Particles
 	PARTICLE_AMOUNT: "particleAmount",
 	SIZE_MULTIPLIER: "sizeChange",

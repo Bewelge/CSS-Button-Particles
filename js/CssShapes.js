@@ -197,7 +197,7 @@ export const getCssStringForShape = shape => {
 	} else if (shape.type == SHAPE_TYPES.BOWTIE) {
 		str += cssStringFunc(shape.color, shape.degree)
 	} else if (shape.type == SHAPE_TYPES.CUSTOM) {
-		str += getSetting(SETTING_IDS.SHAPE_STRING).split(";")[0]
+		str += shape.cssString.split(";")[0]
 	}
 	return str
 }

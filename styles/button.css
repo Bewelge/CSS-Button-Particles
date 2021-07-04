@@ -15,6 +15,7 @@
 	left: 50%;
 	top: 50%;
 	border-radius: 50%;
+	font-weight: 600;
 
 	padding: 0em;
 	border-width: 0px;
@@ -40,9 +41,9 @@
 
 .particleButton:hover:not(:active) {
 	transition: 0.1s ease-in-out all;
-	box-shadow: 0px 0px 0px 8px var(--buttonColor2),
+	/* box-shadow: 0px 0px 0px 8px var(--buttonColor2),
 		0px 0px 0px 14px var(--buttonColor1),
-		inset 0px 0px 0px 0px var(--buttonColor2);
+		inset 0px 0px 0px 0px var(--buttonColor2); */
 
 	transform: perspective(1px) translateZ(0) translate(-50%, -50%)
 		scale(1.05, 1.05);
@@ -51,9 +52,9 @@
 .particleButton:active {
 	transition: box-shadow ease-out 0.1s, background-size ease-in-out 0.1s,
 		background-position ease-in-out 0.1s;
-	box-shadow: 0px 0px 0px 0px var(--buttonColor2),
+	/* box-shadow: 0px 0px 0px 0px var(--buttonColor2),
 		0px 0px 0px 5px var(--buttonColor1),
-		inset 0px 0px 0px 5px var(--buttonColor2);
+		inset 0px 0px 0px 5px var(--buttonColor2); */
 
 	transform: perspective(1px) translateZ(0) translate(-50%, -50%)
 		scale(0.95, 0.95);

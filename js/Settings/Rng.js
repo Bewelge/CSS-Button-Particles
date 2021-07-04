@@ -9,10 +9,7 @@ function mulberry32(a) {
 		return ((t ^ (t >>> 14)) >>> 0) / 4294967296
 	}
 }
-var theRng = mulberry32(getSetting(SETTING_IDS.SEED))
-export const rng = num => {
-	return theRng()
-}
-export const resetRng = () => {
-	theRng = mulberry32(getSetting(SETTING_IDS.SEED))
+
+export const getNewRng = seed => {
+	return mulberry32(seed)
 }

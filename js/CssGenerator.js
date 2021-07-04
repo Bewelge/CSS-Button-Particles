@@ -1,6 +1,6 @@
 import { getCssStringForShape } from "./CssShapes.js"
 import { SETTING_IDS, SETTING_TYPES } from "./Settings/DefaultSettings.js"
-import { getAllCssSettings, getSetting } from "./Settings/Settings.js"
+import { getAllCssSettings } from "./Settings/Settings.js"
 import { getCssVariable, replaceAllString } from "./Util/Util.js"
 
 const NEWLINE = "\n"
@@ -17,18 +17,23 @@ class CssGenerator {
 		this.keyframes = keyframes
 		this.shapes = shapes
 	}
-	generateCss() {
-		this.bgImageString = this.getBgImageString()
-		this.keyframesString = this.getKeyframeString()
-		this.buttonStyleString = this.getButtonStyleString()
+	generateCss(opts, formated, buttonName) {
+		this.bgImageString = this.getBgImageString(opts, formated, buttonName)
+		this.keyframesString = this.getKeyframeString(opts, formated, buttonName)
+		this.buttonStyleString = this.getButtonStyleString(
+			formated,
+			opts,
+			buttonName
+		)
 	}
-	appendStyleTagToBody() {
-		let styleTag = document.body.querySelector("#buttonAnimation")
+	appendStyleTagToBody(buttonName) {
+		let styleTag = document.body.querySelector("#buttonAnimation" + buttonName)
 		if (styleTag) {
 			document.body.removeChild(styleTag)
 		}
 		document.body.appendChild(
 			wrapInStyleTag(
+				buttonName,
 				this.bgImageString +
 					" " +
 					this.keyframesString +
@@ -38,46 +43,57 @@ class CssGenerator {
 		)
 		return styleTag
 	}
-	getButtonStyleString() {
-		let btnWd = getSetting(SETTING_IDS.BUTTON_WIDTH)
-		let btnHt = getSetting(SETTING_IDS.BUTTON_HEIGHT)
-		let btnEffectWd = getSetting(SETTING_IDS.BG_WIDTH)
-		let btnEffectHt = getSetting(SETTING_IDS.BG_HEIGHT)
+	getButtonStyleString(formated, opts, buttonName) {
+		let btnWd = opts[SETTING_IDS.BUTTON_WIDTH]
+		let btnHt = opts[SETTING_IDS.BUTTON_HEIGHT]
+		let btnEffectWd = opts[SETTING_IDS.BG_WIDTH]
+		let btnEffectHt = opts[SETTING_IDS.BG_HEIGHT]
+		let borderRadius = opts[SETTING_IDS.BUTTON_BORDER_RADIUS]
 		return getCssStringFromObj({
-			".particles::after": {
+			["." + buttonName + ".particles::after"]: {
 				left: -1 * (btnEffectWd / 2 - btnWd / 2) + "px",
 				top: -1 * (btnEffectHt / 2 - btnHt / 2) + "px",
 				"min-width": btnEffectWd + "px",
 				"min-height": btnEffectHt + "px"
 			},
-			".particleButton": {
+			["." + buttonName]: {
 				width: btnWd + "px",
 				height: btnHt + "px",
-				// background: getSetting(SETTING_IDS.BG_COLOR),
-				// color: getSetting(SETTING_IDS.FONT_COLOR),
-				"border-radius": getSetting(SETTING_IDS.BUTTON_BORDER_RADIUS) + "px"
-			},
-			".buttonWrap": {
-				width: Math.min(window.innerWidth, btnEffectWd) + "px"
-				// height:
-				// 	Math.min(400, Math.max(window.innerHeight / 2, btnEffectHt)) + "px"
+				background: opts[SETTING_IDS.BG_COLOR],
+				color: opts[SETTING_IDS.BTN_FONT_COLOR],
+				"border-radius": borderRadius + "px",
+				"box-shadow":
+					"0px 0px 0px 5px " +
+					opts[SETTING_IDS.BTN_COLOR_2] +
+					", 0px 0px 0px 9px " +
+					opts[SETTING_IDS.BTN_COLOR_1] +
+					", inset 0px 0px 0px 0px " +
+					opts[SETTING_IDS.BTN_COLOR_2]
 			}
+			// ".buttonWrap": {
+			// 	width: Math.min(window.innerWidth, btnEffectWd) + "px"
+			// 	// height:
+			// 	// 	Math.min(400, Math.max(window.innerHeight / 2, btnEffectHt)) + "px"
+			// }
 		})
 	}
-	getBgImageString(formatted) {
+	getBgImageString(opts, formatted, buttonName) {
 		let newline = formatted ? NEWLINE : ""
 		let tab = formatted ? TAB : ""
 		let bgImageString =
+			"." +
+			buttonName +
 			".animated::after { " +
 			newline +
 			tab +
 			"animation: " +
-			ANIMATION_NAME +
+			(buttonName + "Animation") +
 			" linear " +
-			getSetting(SETTING_IDS.ANIMATION_DURATION) +
+			opts[SETTING_IDS.ANIMATION_DURATION] +
 			"s forwards;"
 		bgImageString += newline + tab + "background-image: "
 		this.shapes.forEach((shape, shapeIndex) => {
+			shape.cssString = opts[SETTING_IDS.SHAPE_STRING] || ""
 			bgImageString += newline + tab + tab + getCssStringForShape(shape)
 			if (shapeIndex < this.shapes.length - 1) {
 				bgImageString += ","
@@ -87,18 +103,18 @@ class CssGenerator {
 
 		return bgImageString
 	}
-	getKeyframeString(formated) {
+	getKeyframeString(opts, formated, buttonName) {
 		let newline = formated ? "\n" : ""
 		let tab = formated ? "    " : ""
 
-		let transfRotateX = getSetting(SETTING_IDS.TRANSFORM_ROTATE_X)
-		let transfRotateY = getSetting(SETTING_IDS.TRANSFORM_ROTATE_Y)
-		let transfRotateZ = getSetting(SETTING_IDS.TRANSFORM_ROTATE_Z)
-		let transfScaleConst = getSetting(SETTING_IDS.TRANSFORM_SCALE_CONSTANT)
-		let transfScaleX = getSetting(SETTING_IDS.TRANSFORM_SCALE_X)
-		let transfScaleY = getSetting(SETTING_IDS.TRANSFORM_SCALE_Y)
+		let transfRotateX = opts[SETTING_IDS.TRANSFORM_ROTATE_X]
+		let transfRotateY = opts[SETTING_IDS.TRANSFORM_ROTATE_Y]
+		let transfRotateZ = opts[SETTING_IDS.TRANSFORM_ROTATE_Z]
+		let transfScaleConst = opts[SETTING_IDS.TRANSFORM_SCALE_CONSTANT]
+		let transfScaleX = opts[SETTING_IDS.TRANSFORM_SCALE_X]
+		let transfScaleY = opts[SETTING_IDS.TRANSFORM_SCALE_Y]
 
-		let keyframesString = "@keyframes " + ANIMATION_NAME + " {"
+		let keyframesString = "@keyframes " + buttonName + "Animation {"
 		this.keyframes.forEach((keyframe, index) => {
 			const percent = Math.floor(keyframe * 1000) / 10
 			keyframesString += newline + tab + percent + "% {" + newline
@@ -204,9 +220,9 @@ class CssGenerator {
 	}
 }
 
-function wrapInStyleTag(styleString) {
+function wrapInStyleTag(buttonName, styleString) {
 	let styleEl = document.createElement("style")
-	styleEl.id = "buttonAnimation"
+	styleEl.id = "buttonAnimation" + buttonName
 	styleEl.innerHTML = styleString
 	return styleEl
 }
@@ -217,18 +233,21 @@ export const getCssGenerator = () => {
 	return theCssGen
 }
 var lastGenerated = window.performance.now()
-export const generateAndAppendCss = retry => {
-	if (window.performance.now() - lastGenerated < 250 && !retry) {
-		window.setTimeout(() => {
-			generateAndAppendCss(true)
-		}, 260)
-	} else {
-		lastGenerated = window.performance.now()
-		theCssGen.generateCss()
-		theCssGen.appendStyleTagToBody()
-		theCssGen.generateListeners.forEach(listener => listener())
-	}
+export const generateAndAppendCss = (buttonName, opts, formated, retry) => {
+	buttonName = buttonName || "theButton"
+	buttonName = replaceAllString(buttonName, " ", "")
+
+	// if (window.performance.now() - lastGenerated < 250 && !retry) {
+	// 	window.setTimeout(() => {
+	// 		generateAndAppendCss(buttonName, formated, true)
+	// 	}, 260)
+	// } else {
+	// 	lastGenerated = window.performance.now()
+	theCssGen.generateCss(opts, formated, buttonName)
+	theCssGen.appendStyleTagToBody(buttonName)
+	theCssGen.generateListeners.forEach(listener => listener())
 }
+// }
 
 export const getHtmlExportString = async () => {
 	let textContent = ""
@@ -238,7 +257,7 @@ export const getHtmlExportString = async () => {
 	return textContent
 }
 
-export const getCssExportString = async () => {
+export const getCssExportString = async (opts, buttonName, formatted) => {
 	let textContent = ""
 	await fetch("../templates/cssTemplate.txt")
 		.then(res => res.text())
@@ -246,11 +265,11 @@ export const getCssExportString = async () => {
 
 	textContent = fillRootVarsInString(textContent)
 	textContent +=
-		theCssGen.getBgImageString(true) +
+		theCssGen.getBgImageString(opts, formatted, buttonName) +
 		" \n" +
-		theCssGen.getKeyframeString(true) +
+		theCssGen.getKeyframeString(opts, formatted, buttonName) +
 		" \n" +
-		theCssGen.getButtonStyleString()
+		theCssGen.getButtonStyleString(formatted, opts, buttonName)
 	return textContent
 }
 export const getJsExportString = async () => {
